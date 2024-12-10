@@ -22,7 +22,6 @@ function Students() {
     }
   };
 
-  // Öğrenci silme
   const deleteStudent = (id) => {
     setStudents(students.filter((student) => student.id !== id));
   };
