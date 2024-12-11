@@ -1,0 +1,78 @@
+/* Global Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Sidebar Container */
+.sidebar {
+  width: 250px; /* Sidebar genişliği */
+  height: 100vh; /* Tüm ekran yüksekliği */
+  background-color: #2c3e50; /* Sidebar arkaplan rengi */
+  color: #ecf0f1; /* Yazı rengi */
+  display: flex;
+  flex-direction: column;
+  padding-top: 20px;
+  position: fixed; /* Sabit sidebar */
+  left: 0;
+  top: 0;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+  font-family: Arial, sans-serif;
+}
+
+/* Sidebar Başlığı */
+.sidebar-title {
+  font-size: 28px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 30px;
+  color: #ffffff;
+}
+
+/* Sidebar Menü */
+.sidebar-menu {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Sidebar Menü */
+.sidebar-menu li {
+  background-color: #ffffff; /* Butonların arkaplan rengi beyaz */
+  color: #2c3e50; /* Yazı rengi koyu mavi */
+  padding: 12px 20px;
+  margin: 8px 10px; /* Sağ ve sol boşluk */
+  text-align: center;
+  border-radius: 8px; /* Kenar yuvarlama */
+  cursor: pointer;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Hafif gölge efekti */
+  transition: all 0.3s ease; /* Yumuşak geçiş efekti */
+}
+
+.sidebar-menu li:hover {
+  background-color: #1abc9c; /* Hover durumunda yeşilimsi renk */
+  color: #ffffff; /* Yazı rengi beyaz */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15); /* Daha belirgin gölge */
+}
+
+.sidebar-menu li.disabled {
+  background-color: #ecf0f1; /* Disabled için gri ton */
+  color: #95a5a6; /* Soluk gri yazı */
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+
+.sidebar-menu li.active {
+  background-color: #1abc9c; /* Aktif sayfa */
+  font-weight: bold;
+}
+/* Ana İçerik Alanı */
+.content {
+  margin-left: 250px; /* Sidebar genişliği kadar boşluk bırak */
+  padding: 20px;
+  background-color: #f4f4f4;
+  min-height: 100vh; /* İçerik alanının tam yükseklikte olmasını sağla */
+}

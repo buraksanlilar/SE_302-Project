@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import WeeklySchedule from "./weeklySchedule";
+import "./StudentManagement.css";
 
 function Students() {
   const [students, setStudents] = useState([]);
@@ -33,11 +34,11 @@ function Students() {
   );
 
   return (
-    <div>
+    <div className="container">
       <h2>Student Management</h2>
 
       {/* Yeni Öğrenci Ekleme */}
-      <div>
+      <div className="form-group">
         <input
           type="text"
           placeholder="Enter student name"
@@ -60,10 +61,10 @@ function Students() {
         {filteredStudents.map((student) => (
           <li key={student.id}>
             {student.name}
-            <button onClick={() => setSelectedStudent(student)}>
-              Edit Schedule
-            </button>
-            <button onClick={() => deleteStudent(student.id)}>Delete</button>
+            <div>
+              <button onClick={() => setSelectedStudent(student)}>Edit</button>
+              <button onClick={() => deleteStudent(student.id)}>Delete</button>
+            </div>
           </li>
         ))}
       </ul>
