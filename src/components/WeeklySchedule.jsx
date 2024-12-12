@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import "./WeeklySchedule.css";
 
 function WeeklySchedule({ student, updateSchedule }) {
   const [schedule, setSchedule] = useState(student.weeklySchedule);
@@ -20,7 +21,7 @@ function WeeklySchedule({ student, updateSchedule }) {
         2,
         "0"
       )}`;
-      minute += 45; // Ders süresi
+      minute += 45;
       if (minute >= 60) {
         hour += 1;
         minute -= 60;
@@ -31,7 +32,7 @@ function WeeklySchedule({ student, updateSchedule }) {
       )}`;
       slots.push(`${start} - ${end}`);
 
-      minute += 10; // 10 dakika mola
+      minute += 10;
       if (minute >= 60) {
         hour += 1;
         minute -= 60;
@@ -40,7 +41,6 @@ function WeeklySchedule({ student, updateSchedule }) {
     return slots;
   }
 
-  // Ders Ekleme Fonksiyonu
   const addCourse = () => {
     const updatedSchedule = [...schedule];
     const startIndex = timeSlots.findIndex((slot) =>
@@ -55,7 +55,6 @@ function WeeklySchedule({ student, updateSchedule }) {
     setCourseName("");
   };
 
-  // Ders Silme
   const deleteCourse = (row, col) => {
     const updatedSchedule = [...schedule];
     updatedSchedule[row][col] = null;
@@ -65,37 +64,37 @@ function WeeklySchedule({ student, updateSchedule }) {
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
   return (
-    <div>
+    <div className="schedule-container">
       <h3>Edit Weekly Schedule for {student.name}</h3>
-      <table border="1" style={{ borderCollapse: "collapse", width: "100%" }}>
-        <thead>
-          <tr>
-            <th>Time</th>
-            {days.map((day, idx) => (
-              <th key={idx}>{day}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {schedule.map((row, rowIndex) => (
-            <tr key={rowIndex}>
-              <td>{timeSlots[rowIndex]}</td>
-              {row.map((course, colIndex) => (
-                <td key={colIndex} style={{ textAlign: "center" }}>
-                  {course || "-"}
-                  {course && (
-                    <button onClick={() => deleteCourse(rowIndex, colIndex)}>
-                      X
-                    </button>
-                  )}
-                </td>
+      <div className="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Time</th>
+              {days.map((day, idx) => (
+                <th key={idx}>{day}</th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
-
-      {/* Ders Ekleme */}
+          </thead>
+          <tbody>
+            {schedule.map((row, rowIndex) => (
+              <tr key={rowIndex}>
+                <td>{timeSlots[rowIndex]}</td>
+                {row.map((course, colIndex) => (
+                  <td key={colIndex}>
+                    {course || "-"}
+                    {course && (
+                      <button onClick={() => deleteCourse(rowIndex, colIndex)}>
+                        X
+                      </button>
+                    )}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       <div>
         <h4>Add Course</h4>
         <input
@@ -128,8 +127,6 @@ function WeeklySchedule({ student, updateSchedule }) {
         />
         <button onClick={addCourse}>Add Course</button>
       </div>
-
-      {/* Save Button */}
       <button onClick={() => updateSchedule(schedule)}>Save Schedule</button>
     </div>
   );

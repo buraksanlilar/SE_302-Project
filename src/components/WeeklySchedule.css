@@ -1,0 +1,49 @@
+/* WeeklySchedule.css */
+
+.schedule-container {
+  padding: 20px;
+  text-align: center;
+}
+
+.table-container {
+  max-height: 400px; /* Scroll eklenmesi */
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  margin: 20px 0;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+}
+
+th {
+  background-color: #f4f4f4;
+}
+
+tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+tr:hover {
+  background-color: #f1f1f1;
+}
+
+button {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 5px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #c0392b;
+}
