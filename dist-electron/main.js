@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, Menu } from "electron";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
@@ -25,6 +25,46 @@ function createWindow() {
   } else {
     win.loadFile(path.join(RENDERER_DIST, "index.html"));
   }
+  const menuTemplate = [
+    {
+      label: "File",
+      submenu: [
+        { label: "Import", click: () => console.log("Open Clicked") },
+        { label: "Export", click: () => console.log("Save Clicked") },
+        { type: "separator" },
+        { label: "Exit", role: "quit" }
+      ]
+    },
+    {
+      label: "Edit",
+      submenu: [
+        { role: "undo" },
+        { role: "redo" },
+        { type: "separator" },
+        { role: "cut" },
+        { role: "copy" },
+        { role: "paste" }
+      ]
+    },
+    {
+      label: "View",
+      submenu: [
+        { role: "reload" },
+        { role: "toggleDevTools" }
+      ]
+    },
+    {
+      label: "Help",
+      submenu: [
+        {
+          label: "About",
+          click: () => console.log("About Clicked")
+        }
+      ]
+    }
+  ];
+  const menu = Menu.buildFromTemplate(menuTemplate);
+  Menu.setApplicationMenu(menu);
 }
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
