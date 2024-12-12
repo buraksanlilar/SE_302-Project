@@ -46,13 +46,24 @@ function WeeklySchedule({ student, updateSchedule }) {
     const startIndex = timeSlots.findIndex((slot) =>
       slot.startsWith(startTime)
     );
+
     if (startIndex !== -1) {
+      // Çakışma kontrolü
+      for (let i = startIndex; i < startIndex + duration && i < 16; i++) {
+        if (updatedSchedule[i][selectedDay]) {
+          console.log("This time slot is already occupied by another course.");
+          return;
+        }
+        
+      }
+
+      // Ders ekleme
       for (let i = startIndex; i < startIndex + duration && i < 16; i++) {
         updatedSchedule[i][selectedDay] = courseName;
       }
       setSchedule(updatedSchedule);
+      setCourseName("");
     }
-    setCourseName("");
   };
 
   const deleteCourse = (row, col) => {
