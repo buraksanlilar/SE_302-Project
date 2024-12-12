@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Sidebar from "./components/Sidebar.jsx";
 import Students from "./components/Students.jsx";
+import Classrooms from "./components/Classrooms.jsx";  // Classrooms bileşenini import ettik
 import "./App.css";
 
 function App() {
@@ -8,10 +9,11 @@ function App() {
 
   return (
     <div className="app-container">
-      <Sidebar setActiveTab={setActiveTab} />
+      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
       <div className="content">
         {activeTab === "dashboard" && <h1 className="page-title">Dashboard</h1>}
         {activeTab === "students" && <Students />}
+        {activeTab === "classrooms" && <Classrooms />} {/* Burada Classrooms bileşenini render ediyoruz */}
         {activeTab === "teachers" && <h1 className="page-title">Teachers</h1>}
         {activeTab === "departments" && (
           <h1 className="page-title">Departments</h1>

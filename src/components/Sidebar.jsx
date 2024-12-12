@@ -18,6 +18,12 @@ function Sidebar({ activeTab, setActiveTab }) {
         >
           Students
         </li>
+        <li
+          className={activeTab === "classrooms" ? "active" : ""}
+          onClick={() => setActiveTab("classrooms")}
+        >
+          Classrooms
+        </li>
         <li className="disabled">Teachers</li>
         <li className="disabled">Departments</li>
         <li className="disabled">Subjects</li>
