@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import WeeklySchedule from "./weeklySchedule";
+import React, { useState, useEffect } from "react";
+import WeeklySchedule from "./WeeklySchedule";
 import "./StudentManagement.css";
 
 function Students() {
@@ -8,17 +8,30 @@ function Students() {
   const [newStudent, setNewStudent] = useState("");
   const [selectedStudent, setSelectedStudent] = useState(null);
 
+  // Sayfa ilk yüklendiğinde localStorage'dan öğrencileri al
+  useEffect(() => {
+    const storedStudents = JSON.parse(localStorage.getItem("students"));
+    if (storedStudents) {
+      setStudents(storedStudents);
+    }
+  }, []);
+
+  // Öğrencileri localStorage'a kaydet
+  useEffect(() => {
+    if (students.length > 0) {
+      localStorage.setItem("students", JSON.stringify(students));
+    }
+  }, [students]);
+
   // Yeni öğrenci ekleme
   const addStudent = () => {
     if (newStudent.trim()) {
-      setStudents([
-        ...students,
-        {
-          id: Date.now(),
-          name: newStudent,
-          weeklySchedule: Array.from({ length: 16 }, () => Array(5).fill(null)),
-        },
-      ]);
+      const newStudentData = {
+        id: Date.now(),
+        name: newStudent,
+        weeklySchedule: Array.from({ length: 16 }, () => Array(5).fill(null)),
+      };
+      setStudents([...students, newStudentData]);
       setNewStudent("");
     }
   };
@@ -36,37 +49,43 @@ function Students() {
     <div className="container">
       <h2>Student Management</h2>
 
-      {/* Yeni Öğrenci Ekleme */}
-      <div className="form-group">
-        <input
-          type="text"
-          placeholder="Enter student name"
-          value={newStudent}
-          onChange={(e) => setNewStudent(e.target.value)}
-        />
-        <button onClick={addStudent}>Add Student</button>
-      </div>
+      {/* Öğrenci düzenleme yoksa ekleme ve arama kısmını göster */}
+      {!selectedStudent && (
+        <>
+          <div className="form-group">
+            <input
+              type="text"
+              placeholder="Enter student name"
+              value={newStudent}
+              onChange={(e) => setNewStudent(e.target.value)}
+            />
+            <button onClick={addStudent}>Add Student</button>
+          </div>
 
-      {/* Öğrenci Arama */}
-      <input
-        type="text"
-        placeholder="Search student"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-      />
+          {/* Öğrenci Arama */}
+          <input
+            type="text"
+            placeholder="Search student"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </>
+      )}
 
       {/* Öğrenci Listesi */}
-      <ul>
-        {filteredStudents.map((student) => (
-          <li key={student.id}>
-            {student.name}
-            <div>
-              <button onClick={() => setSelectedStudent(student)}>Edit</button>
-              <button onClick={() => deleteStudent(student.id)}>Delete</button>
-            </div>
-          </li>
-        ))}
-      </ul>
+      {!selectedStudent && (
+        <ul>
+          {filteredStudents.map((student) => (
+            <li key={student.id}>
+              {student.name}
+              <div>
+                <button onClick={() => setSelectedStudent(student)}>Edit</button>
+                <button onClick={() => deleteStudent(student.id)}>Delete</button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
 
       {/* Weekly Schedule Düzenleme */}
       {selectedStudent && (
@@ -80,7 +99,7 @@ function Students() {
                   : s
               )
             );
-            setSelectedStudent(null);
+            setSelectedStudent(null);  // Düzenleme bittiğinde öğrenci listesini göstermek için
           }}
         />
       )}
@@ -89,5 +108,3 @@ function Students() {
 }
 
 export default Students;
-
-  

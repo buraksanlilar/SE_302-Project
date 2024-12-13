@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./WeeklySchedule.css";
 
 function WeeklySchedule({ student, updateSchedule }) {
@@ -36,8 +36,8 @@ function WeeklySchedule({ student, updateSchedule }) {
     return slots;
   }
 
+  // Ders ekleme
   const addCourse = () => {
-    // Hata kontrolü
     if (!courseName.trim() || !teacherName.trim()) {
       setErrorMessage("Both Course Name and Teacher Name are required.");
       return;
@@ -65,6 +65,7 @@ function WeeklySchedule({ student, updateSchedule }) {
     }
   };
 
+  // Ders silme
   const deleteCourse = (row, col) => {
     const updatedSchedule = [...schedule];
     updatedSchedule[row][col] = null;

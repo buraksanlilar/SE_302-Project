@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Classrooms.css";
 
 function Classrooms() {
@@ -6,24 +6,38 @@ function Classrooms() {
   const [newClassroom, setNewClassroom] = useState("");
   const [capacity, setCapacity] = useState("");
 
+  // localStorage'dan sınıfları yükle
+  useEffect(() => {
+    const savedClassrooms = JSON.parse(localStorage.getItem("classrooms"));
+    if (savedClassrooms) {
+      setClassrooms(savedClassrooms);
+    }
+  }, []);
+
+  // localStorage'a sınıfları kaydet
+  useEffect(() => {
+    if (classrooms.length > 0) {
+      localStorage.setItem("classrooms", JSON.stringify(classrooms));
+    }
+  }, [classrooms]);
+
   // Yeni sınıf ekleme
   const addClassroom = () => {
     if (newClassroom.trim() && capacity > 0) {
-      setClassrooms([
-        ...classrooms,
-        {
-          id: Date.now(),
-          name: newClassroom,
-          capacity: capacity,
-        },
-      ]);
+      const newClass = {
+        id: Date.now(),
+        name: newClassroom,
+        capacity: capacity,
+      };
+      setClassrooms((prevClassrooms) => [...prevClassrooms, newClass]);
       setNewClassroom("");
       setCapacity("");
     }
   };
 
   const deleteClassroom = (id) => {
-    setClassrooms(classrooms.filter((classroom) => classroom.id !== id));
+    const updatedClassrooms = classrooms.filter((classroom) => classroom.id !== id);
+    setClassrooms(updatedClassrooms);
   };
 
   return (
