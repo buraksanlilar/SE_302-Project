@@ -1,50 +1,24 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useContext } from "react";
+import { ClassroomContext } from "../context/ClassroomContext";
 import "./Classrooms.css";
 
 function Classrooms() {
-  const [classrooms, setClassrooms] = useState([]);
+  const { classrooms, addClassroom, deleteClassroom } = useContext(ClassroomContext);
   const [newClassroom, setNewClassroom] = useState("");
   const [capacity, setCapacity] = useState("");
 
-  // localStorage'dan sınıfları yükle
-  useEffect(() => {
-    const savedClassrooms = JSON.parse(localStorage.getItem("classrooms"));
-    if (savedClassrooms) {
-      setClassrooms(savedClassrooms);
-    }
-  }, []);
-
-  // localStorage'a sınıfları kaydet
-  useEffect(() => {
-    if (classrooms.length > 0) {
-      localStorage.setItem("classrooms", JSON.stringify(classrooms));
-    }
-  }, [classrooms]);
-
-  // Yeni sınıf ekleme
-  const addClassroom = () => {
+  const handleAddClassroom = () => {
     if (newClassroom.trim() && capacity > 0) {
-      const newClass = {
-        id: Date.now(),
-        name: newClassroom,
-        capacity: capacity,
-      };
-      setClassrooms((prevClassrooms) => [...prevClassrooms, newClass]);
+      const newClass = { id: Date.now(), name: newClassroom, capacity };
+      addClassroom(newClass);
       setNewClassroom("");
       setCapacity("");
     }
   };
 
-  const deleteClassroom = (id) => {
-    const updatedClassrooms = classrooms.filter((classroom) => classroom.id !== id);
-    setClassrooms(updatedClassrooms);
-  };
-
   return (
     <div className="classrooms-container">
       <h3>Manage Classrooms</h3>
-
-      {/* Yeni sınıf ekleme formu */}
       <div className="form-group">
         <input
           type="text"
@@ -58,10 +32,9 @@ function Classrooms() {
           value={capacity}
           onChange={(e) => setCapacity(e.target.value)}
         />
-        <button onClick={addClassroom}>Add Classroom</button>
+        <button onClick={handleAddClassroom}>Add Classroom</button>
       </div>
 
-      {/* Sınıf listesi */}
       <ul>
         {classrooms.map((classroom) => (
           <li key={classroom.id}>

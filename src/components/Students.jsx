@@ -1,29 +1,31 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { ClassroomContext } from "../context/ClassroomContext";
 import WeeklySchedule from "./WeeklySchedule";
 import "./StudentManagement.css";
 
 function Students() {
+  const { classrooms } = useContext(ClassroomContext);
   const [students, setStudents] = useState([]);
   const [search, setSearch] = useState("");
   const [newStudent, setNewStudent] = useState("");
   const [selectedStudent, setSelectedStudent] = useState(null);
 
-  // Sayfa ilk yüklendiğinde localStorage'dan öğrencileri al
+  // Load students from localStorage on component mount
   useEffect(() => {
-    const storedStudents = JSON.parse(localStorage.getItem("students"));
+    const storedStudents = localStorage.getItem("students");
     if (storedStudents) {
-      setStudents(storedStudents);
+      setStudents(JSON.parse(storedStudents));
     }
   }, []);
 
-  // Öğrencileri localStorage'a kaydet
+  // Save students to localStorage whenever the students state changes
   useEffect(() => {
     if (students.length > 0) {
       localStorage.setItem("students", JSON.stringify(students));
     }
   }, [students]);
 
-  // Yeni öğrenci ekleme
+  // Add a new student
   const addStudent = () => {
     if (newStudent.trim()) {
       const newStudentData = {
@@ -31,16 +33,17 @@ function Students() {
         name: newStudent,
         weeklySchedule: Array.from({ length: 16 }, () => Array(5).fill(null)),
       };
-      setStudents([...students, newStudentData]);
+      setStudents((prevStudents) => [...prevStudents, newStudentData]);
       setNewStudent("");
     }
   };
 
+  // Delete a student
   const deleteStudent = (id) => {
-    setStudents(students.filter((student) => student.id !== id));
+    setStudents((prevStudents) => prevStudents.filter((student) => student.id !== id));
   };
 
-  // Öğrenci arama
+  // Filter students based on search input
   const filteredStudents = students.filter((student) =>
     student.name.toLowerCase().includes(search.toLowerCase())
   );
@@ -49,7 +52,6 @@ function Students() {
     <div className="container">
       <h2>Student Management</h2>
 
-      {/* Öğrenci düzenleme yoksa ekleme ve arama kısmını göster */}
       {!selectedStudent && (
         <>
           <div className="form-group">
@@ -62,7 +64,6 @@ function Students() {
             <button onClick={addStudent}>Add Student</button>
           </div>
 
-          {/* Öğrenci Arama */}
           <input
             type="text"
             placeholder="Search student"
@@ -72,7 +73,6 @@ function Students() {
         </>
       )}
 
-      {/* Öğrenci Listesi */}
       {!selectedStudent && (
         <ul>
           {filteredStudents.map((student) => (
@@ -87,19 +87,18 @@ function Students() {
         </ul>
       )}
 
-      {/* Weekly Schedule Düzenleme */}
       {selectedStudent && (
         <WeeklySchedule
           student={selectedStudent}
+          classrooms={classrooms}
           updateSchedule={(updatedSchedule) => {
-            setStudents(
-              students.map((s) =>
-                s.id === selectedStudent.id
-                  ? { ...s, weeklySchedule: updatedSchedule }
-                  : s
-              )
+            const updatedStudents = students.map((s) =>
+              s.id === selectedStudent.id
+                ? { ...s, weeklySchedule: updatedSchedule }
+                : s
             );
-            setSelectedStudent(null);  // Düzenleme bittiğinde öğrenci listesini göstermek için
+            setStudents(updatedStudents);
+            setSelectedStudent(null);
           }}
         />
       )}
