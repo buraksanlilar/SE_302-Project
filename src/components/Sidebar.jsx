@@ -24,10 +24,36 @@ function Sidebar({ activeTab, setActiveTab }) {
         >
           Classrooms
         </li>
-        <li className="disabled">Teachers</li>
-        <li className="disabled">Departments</li>
-        <li className="disabled">Subjects</li>
-        <li className="disabled">Invoices</li>
+        <li
+          className={activeTab === "teachers" ? "active" : ""}
+          onClick={() => setActiveTab("teachers")}
+        >
+          Teachers
+        </li>
+        <li
+          className={activeTab === "courses" ? "active" : ""}
+          onClick={() => setActiveTab("courses")}
+        >
+          Courses
+        </li>
+        <li
+          className={activeTab === "departments" ? "active" : ""}
+          onClick={() => setActiveTab("departments")}
+        >
+          Departments
+        </li>
+        <li
+          className={activeTab === "subjects" ? "active" : ""}
+          onClick={() => setActiveTab("subjects")}
+        >
+          Subjects
+        </li>
+        <li
+          className={activeTab === "invoices" ? "active" : ""}
+          onClick={() => setActiveTab("invoices")}
+        >
+          Invoices
+        </li>
       </ul>
     </div>
   );
