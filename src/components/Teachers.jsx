@@ -1,6 +1,6 @@
 import React, { useState, useContext } from "react";
 import { TeachersContext } from "../context/TeachersContext";
-import "./components.css"; // Ortak CSS dosyasını ekleyin
+import "./components.css";
 
 function Teachers() {
   const { teachers, addTeacher, deleteTeacher } = useContext(TeachersContext);
@@ -13,8 +13,8 @@ function Teachers() {
     }
 
     const newTeacherData = {
-      id: Date.now(),
-      name: newTeacher,
+      id: Date.now(), // ID olarak isim kullanılıyor
+      name: newTeacher.trim(),
     };
 
     addTeacher(newTeacherData);

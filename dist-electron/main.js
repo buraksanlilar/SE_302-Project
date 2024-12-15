@@ -1,7 +1,8 @@
-import { app, BrowserWindow, Menu, dialog } from "electron";
+import { ipcMain, app, BrowserWindow, Menu, dialog } from "electron";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import fs from "fs";
 createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 process.env.APP_ROOT = path.join(__dirname, "..");
@@ -32,15 +33,30 @@ function createWindow() {
         {
           label: "Import",
           click: async () => {
+            var _a;
             const result = await dialog.showOpenDialog({
               properties: ["openFile"],
-              filters: [
-                { name: "Comma Separated Values (CSV)", extensions: ["csv"] }
-                // CSV dosya türü
-              ]
+              filters: [{ name: "Comma Separated Values (CSV)", extensions: ["csv"] }]
             });
-            if (!result.canceled) {
-              console.log("Selected file:", result.filePaths[0]);
+            if (!result.canceled && result.filePaths.length > 0) {
+              const filePath = result.filePaths[0];
+              const fileContent = fs.readFileSync(filePath, "utf-8");
+              const lines = fileContent.split("\n").filter((line) => line.trim() !== "");
+              const headers = (_a = lines.shift()) == null ? void 0 : _a.split(";").map((h) => h.trim());
+              if (!headers) {
+                console.error("CSV dosyasında header bulunamadı.");
+                return;
+              }
+              const jsonData = lines.map((line) => line.split(";")).filter((cols) => cols.some((col) => col.trim() !== "")).map((line) => {
+                const obj = {};
+                headers.forEach((header, index) => {
+                  var _a2;
+                  obj[header] = ((_a2 = line[index]) == null ? void 0 : _a2.trim()) || "";
+                });
+                return obj;
+              });
+              console.log("Processed CSV Data:", jsonData);
+              win == null ? void 0 : win.webContents.send("csv-data", jsonData);
             }
           }
         },
@@ -62,24 +78,19 @@ function createWindow() {
     },
     {
       label: "View",
-      submenu: [
-        { role: "reload" },
-        { role: "toggleDevTools" }
-      ]
+      submenu: [{ role: "reload" }, { role: "toggleDevTools" }]
     },
     {
       label: "Help",
-      submenu: [
-        {
-          label: "About",
-          click: () => console.log("About Clicked")
-        }
-      ]
+      submenu: [{ label: "About", click: () => console.log("About Clicked") }]
     }
   ];
   const menu = Menu.buildFromTemplate(menuTemplate);
   Menu.setApplicationMenu(menu);
 }
+ipcMain.handle("request-csv-data", () => {
+  return { message: "No CSV loaded yet!" };
+});
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     app.quit();

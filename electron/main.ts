@@ -1,30 +1,22 @@
-import { app, BrowserWindow, Menu, dialog } from 'electron' // dialog modülünü ekledik
-import { createRequire } from 'node:module'
-import { fileURLToPath } from 'node:url'
-import path from 'node:path'
+import { app, BrowserWindow, Menu, dialog, ipcMain } from 'electron'; // ipcMain ekledik
+import { createRequire } from 'node:module';
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
+import fs from 'fs';
 
-const require = createRequire(import.meta.url)
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const require = createRequire(import.meta.url);
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-// The built directory structure
-//
-// ├─┬─┬ dist
-// │ │ └── index.html
-// │ │
-// │ ├─┬ dist-electron
-// │ │ ├── main.js
-// │ │ └── preload.mjs
-// │
-process.env.APP_ROOT = path.join(__dirname, '..')
+process.env.APP_ROOT = path.join(__dirname, '..');
+export const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL'];
+export const MAIN_DIST = path.join(process.env.APP_ROOT, 'dist-electron');
+export const RENDERER_DIST = path.join(process.env.APP_ROOT, 'dist');
 
-// 🚧 Use ['ENV_NAME'] avoid vite:define plugin - Vite@2.x
-export const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL']
-export const MAIN_DIST = path.join(process.env.APP_ROOT, 'dist-electron')
-export const RENDERER_DIST = path.join(process.env.APP_ROOT, 'dist')
+process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
+  ? path.join(process.env.APP_ROOT, 'public')
+  : RENDERER_DIST;
 
-process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, 'public') : RENDERER_DIST
-
-let win: BrowserWindow | null
+let win: BrowserWindow | null;
 
 function createWindow() {
   win = new BrowserWindow({
@@ -32,20 +24,19 @@ function createWindow() {
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
     },
-  })
+  });
 
-  // Test active push message to Renderer-process.
   win.webContents.on('did-finish-load', () => {
-    win?.webContents.send('main-process-message', (new Date).toLocaleString())
-  })
+    win?.webContents.send('main-process-message', new Date().toLocaleString());
+  });
 
   if (VITE_DEV_SERVER_URL) {
-    win.loadURL(VITE_DEV_SERVER_URL)
+    win.loadURL(VITE_DEV_SERVER_URL);
   } else {
-    win.loadFile(path.join(RENDERER_DIST, 'index.html'))
+    win.loadFile(path.join(RENDERER_DIST, 'index.html'));
   }
 
-  // Native Menu Ekleme Kodu
+  // Native Menu
   const menuTemplate: Electron.MenuItemConstructorOptions[] = [
     {
       label: 'File',
@@ -55,14 +46,38 @@ function createWindow() {
           click: async () => {
             const result = await dialog.showOpenDialog({
               properties: ['openFile'],
-              filters: [
-                { name: 'Comma Separated Values (CSV)', extensions: ['csv'] }, // CSV dosya türü
-              ],
-            })
+              filters: [{ name: 'Comma Separated Values (CSV)', extensions: ['csv'] }],
+            });
 
-            if (!result.canceled) {
-              console.log('Selected file:', result.filePaths[0]) // Seçilen dosyanın yolu
-              // Burada dosya ile yapılacak işlemi ekleyebilirsiniz
+            if (!result.canceled && result.filePaths.length > 0) {
+              const filePath = result.filePaths[0];
+              const fileContent = fs.readFileSync(filePath, 'utf-8');
+
+              // CSV'yi JSON'a dönüştürme
+              const lines = fileContent
+                .split('\n')
+                .filter((line) => line.trim() !== ''); // Boş satırları kaldır
+
+              const headers = lines.shift()?.split(';').map((h) => h.trim());
+
+              if (!headers) {
+                console.error('CSV dosyasında header bulunamadı.');
+                return;
+              }
+
+              const jsonData = lines
+                .map((line) => line.split(';'))
+                .filter((cols) => cols.some((col) => col.trim() !== '')) // Boş kolonları kaldır
+                .map((line) => {
+                  const obj: any = {};
+                  headers.forEach((header, index) => {
+                    obj[header] = line[index]?.trim() || ''; // Eksik değerleri boş string olarak ekle
+                  });
+                  return obj;
+                });
+
+              console.log('Processed CSV Data:', jsonData); // Kontrol için log
+              win?.webContents.send('csv-data', jsonData); // React tarafına gönder
             }
           },
         },
@@ -84,40 +99,34 @@ function createWindow() {
     },
     {
       label: 'View',
-      submenu: [
-        { role: 'reload' },
-        { role: 'toggleDevTools' },
-      ],
+      submenu: [{ role: 'reload' }, { role: 'toggleDevTools' }],
     },
     {
       label: 'Help',
-      submenu: [
-        {
-          label: 'About',
-          click: () => console.log('About Clicked'),
-        },
-      ],
+      submenu: [{ label: 'About', click: () => console.log('About Clicked') }],
     },
-  ]
+  ];
 
-  const menu = Menu.buildFromTemplate(menuTemplate)
-  Menu.setApplicationMenu(menu)
+  const menu = Menu.buildFromTemplate(menuTemplate);
+  Menu.setApplicationMenu(menu);
 }
 
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
+// React ile iletişim için IPC event
+ipcMain.handle('request-csv-data', () => {
+  return { message: 'No CSV loaded yet!' };
+});
+
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
-    app.quit()
-    win = null
+    app.quit();
+    win = null;
   }
-})
+});
 
 app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow()
+    createWindow();
   }
-})
+});
 
-app.whenReady().then(createWindow)
+app.whenReady().then(createWindow);
