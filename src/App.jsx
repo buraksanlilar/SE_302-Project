@@ -10,7 +10,9 @@ function App() {
   const [activeTab, setActiveTab] = useState("dashboard");
 
   return (
-    <ClassroomProvider> {/* ClassroomProvider ile uygulamayı sarmaladık */}
+    <ClassroomProvider>
+      {" "}
+      {/* ClassroomProvider ile uygulamayı sarmaladık */}
       <div className="app-container">
         <div className="main-content">
           <Sidebar setActiveTab={setActiveTab} />
@@ -18,11 +20,14 @@ function App() {
             {activeTab === "dashboard" && (
               <h1 className="page-title">Dashboard</h1>
             )}
-            {activeTab === "students" && <Students />} {/* Students güncellendi */}
+            {activeTab === "students" && <Students />}
+
             {activeTab === "teachers" && (
               <h1 className="page-title">Teachers</h1>
             )}
-            {activeTab === "classrooms" && <Classrooms />} {/* Classrooms */}
+
+            {activeTab === "classrooms" && <Classrooms />}
+
             {activeTab === "departments" && (
               <h1 className="page-title">Departments</h1>
             )}

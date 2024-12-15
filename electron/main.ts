@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Menu } from 'electron' // Menu modülü eklendi
+import { app, BrowserWindow, Menu, dialog } from 'electron' // dialog modülünü ekledik
 import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
@@ -45,12 +45,27 @@ function createWindow() {
     win.loadFile(path.join(RENDERER_DIST, 'index.html'))
   }
 
-  // 🆕 Native Menu Ekleme Kodu
+  // Native Menu Ekleme Kodu
   const menuTemplate: Electron.MenuItemConstructorOptions[] = [
     {
       label: 'File',
       submenu: [
-        { label: 'Import', click: () => console.log('Open Clicked') },
+        {
+          label: 'Import',
+          click: async () => {
+            const result = await dialog.showOpenDialog({
+              properties: ['openFile'],
+              filters: [
+                { name: 'Comma Separated Values (CSV)', extensions: ['csv'] }, // CSV dosya türü
+              ],
+            })
+
+            if (!result.canceled) {
+              console.log('Selected file:', result.filePaths[0]) // Seçilen dosyanın yolu
+              // Burada dosya ile yapılacak işlemi ekleyebilirsiniz
+            }
+          },
+        },
         { label: 'Export', click: () => console.log('Save Clicked') },
         { type: 'separator' },
         { label: 'Exit', role: 'quit' },

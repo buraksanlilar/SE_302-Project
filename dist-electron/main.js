@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Menu } from "electron";
+import { app, BrowserWindow, Menu, dialog } from "electron";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
@@ -29,7 +29,21 @@ function createWindow() {
     {
       label: "File",
       submenu: [
-        { label: "Import", click: () => console.log("Open Clicked") },
+        {
+          label: "Import",
+          click: async () => {
+            const result = await dialog.showOpenDialog({
+              properties: ["openFile"],
+              filters: [
+                { name: "Comma Separated Values (CSV)", extensions: ["csv"] }
+                // CSV dosya türü
+              ]
+            });
+            if (!result.canceled) {
+              console.log("Selected file:", result.filePaths[0]);
+            }
+          }
+        },
         { label: "Export", click: () => console.log("Save Clicked") },
         { type: "separator" },
         { label: "Exit", role: "quit" }
