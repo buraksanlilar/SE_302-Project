@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import { CoursesContext } from "../context/CoursesContext";
 import "./WeeklySchedule.css";
 
-function WeeklySchedule({ student, classrooms, updateSchedule }) {
+function WeeklySchedule({ student, updateSchedule }) {
+  const { courses } = useContext(CoursesContext);
   const [schedule, setSchedule] = useState(student.weeklySchedule);
-  const [courseName, setCourseName] = useState("");
-  const [teacherName, setTeacherName] = useState("");
-  const [className, setClassName] = useState("");
+  const [selectedCourse, setSelectedCourse] = useState("");
   const [selectedDay, setSelectedDay] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
   const [duration, setDuration] = useState(1);
@@ -44,14 +44,15 @@ function WeeklySchedule({ student, classrooms, updateSchedule }) {
     return slots;
   }
 
-  const addCourse = () => {
-    if (!courseName.trim() || !teacherName.trim() || !className || !selectedDay || !selectedTime) {
-      setErrorMessage("All fields are required.");
+  const addCourseToSchedule = () => {
+    if (!selectedCourse || !selectedDay || !selectedTime) {
+      setErrorMessage("Please fill in all fields.");
       return;
     }
 
     const dayIndex = days.indexOf(selectedDay);
     const timeIndex = timeSlots.indexOf(selectedTime);
+
     if (dayIndex === -1 || timeIndex === -1) {
       setErrorMessage("Invalid day or time selected.");
       return;
@@ -73,23 +74,15 @@ function WeeklySchedule({ student, classrooms, updateSchedule }) {
 
     for (let i = 0; i < duration; i++) {
       const currentTimeIndex = timeIndex + i;
-      updatedSchedule[currentTimeIndex][dayIndex] = `${courseName} (${teacherName}, ${className})`;
+      updatedSchedule[currentTimeIndex][dayIndex] = selectedCourse;
     }
 
     setSchedule(updatedSchedule);
-    setCourseName("");
-    setTeacherName("");
-    setClassName("");
+    setSelectedCourse("");
     setSelectedDay("");
     setSelectedTime("");
     setDuration(1);
     setErrorMessage("");
-  };
-
-  const deleteCourse = (rowIndex, colIndex) => {
-    const updatedSchedule = [...schedule];
-    updatedSchedule[rowIndex][colIndex] = null;
-    setSchedule(updatedSchedule);
   };
 
   return (
@@ -100,26 +93,17 @@ function WeeklySchedule({ student, classrooms, updateSchedule }) {
 
       <div>
         <h4>Add Course</h4>
-        <input
-          type="text"
-          placeholder="Course Name"
-          value={courseName}
-          onChange={(e) => setCourseName(e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="Teacher Name"
-          value={teacherName}
-          onChange={(e) => setTeacherName(e.target.value)}
-        />
         <select
-          value={className}
-          onChange={(e) => setClassName(e.target.value)}
+          value={selectedCourse}
+          onChange={(e) => setSelectedCourse(e.target.value)}
         >
-          <option value="">Select Classroom</option>
-          {classrooms.map((classroom) => (
-            <option key={classroom.id} value={classroom.name}>
-              {classroom.name}
+          <option value="">Select Course</option>
+          {courses.map((course) => (
+            <option
+              key={course.id}
+              value={`${course.courseName} (${course.teacherName})`}
+            >
+              {course.courseName} (Teacher: {course.teacherName})
             </option>
           ))}
         </select>
@@ -128,8 +112,8 @@ function WeeklySchedule({ student, classrooms, updateSchedule }) {
           onChange={(e) => setSelectedDay(e.target.value)}
         >
           <option value="">Select Day</option>
-          {days.map((day, idx) => (
-            <option key={idx} value={day}>
+          {days.map((day) => (
+            <option key={day} value={day}>
               {day}
             </option>
           ))}
@@ -139,9 +123,9 @@ function WeeklySchedule({ student, classrooms, updateSchedule }) {
           onChange={(e) => setSelectedTime(e.target.value)}
         >
           <option value="">Select Time</option>
-          {timeSlots.map((time, idx) => (
-            <option key={idx} value={time}>
-              {time}
+          {timeSlots.map((slot, idx) => (
+            <option key={idx} value={slot}>
+              {slot}
             </option>
           ))}
         </select>
@@ -153,7 +137,7 @@ function WeeklySchedule({ student, classrooms, updateSchedule }) {
           onChange={(e) => setDuration(Number(e.target.value))}
           placeholder="Duration (hours)"
         />
-        <button onClick={addCourse}>Add Course</button>
+        <button onClick={addCourseToSchedule}>Add Course</button>
       </div>
 
       <div className="table-container">
@@ -161,8 +145,8 @@ function WeeklySchedule({ student, classrooms, updateSchedule }) {
           <thead>
             <tr>
               <th>Time</th>
-              {days.map((day, idx) => (
-                <th key={idx}>{day}</th>
+              {days.map((day) => (
+                <th key={day}>{day}</th>
               ))}
             </tr>
           </thead>
@@ -171,12 +155,7 @@ function WeeklySchedule({ student, classrooms, updateSchedule }) {
               <tr key={rowIndex}>
                 <td>{timeSlots[rowIndex]}</td>
                 {row.map((course, colIndex) => (
-                  <td key={colIndex}>
-                    {course || "-"}
-                    {course && (
-                      <button onClick={() => deleteCourse(rowIndex, colIndex)}>X</button>
-                    )}
-                  </td>
+                  <td key={colIndex}>{course || "-"}</td>
                 ))}
               </tr>
             ))}
