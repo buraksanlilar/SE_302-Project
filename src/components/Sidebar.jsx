@@ -36,24 +36,7 @@ function Sidebar({ activeTab, setActiveTab }) {
         >
           Courses
         </li>
-        <li
-          className={activeTab === "departments" ? "active" : ""}
-          onClick={() => setActiveTab("departments")}
-        >
-          Departments
-        </li>
-        <li
-          className={activeTab === "subjects" ? "active" : ""}
-          onClick={() => setActiveTab("subjects")}
-        >
-          Subjects
-        </li>
-        <li
-          className={activeTab === "invoices" ? "active" : ""}
-          onClick={() => setActiveTab("invoices")}
-        >
-          Invoices
-        </li>
+        {/* Subjects ve Invoices menülerini kaldırdık */}
       </ul>
     </div>
   );
