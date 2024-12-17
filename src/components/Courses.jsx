@@ -93,6 +93,7 @@ function Courses() {
     alert("Auto-Assign Completed!");
     console.log(updatedCourses);
   };
+  
   return (
     <div className="container">
       <h3>Manage Courses</h3>
