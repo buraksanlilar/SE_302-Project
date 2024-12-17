@@ -1,76 +1,69 @@
 import React, { createContext, useState, useEffect } from "react";
- 
+
 export const CoursesContext = createContext();
- 
+
 const CoursesProvider = ({ children }) => {
   const [courses, setCourses] = useState(() => {
     const savedCourses = JSON.parse(localStorage.getItem("courses"));
     return savedCourses || [];
   });
- 
-  // Yeni kurs ekleme
-  const addCourse = (newCourse) => {
-    const updatedCourses = [...courses, newCourse];
-    setCourses(updatedCourses);
-    localStorage.setItem("courses", JSON.stringify(updatedCourses));
-  };
- 
-  // Kurs silme
-  const deleteCourse = (id) => {
-    const updatedCourses = courses.filter((course) => course.id !== id);
-    setCourses(updatedCourses);
-    localStorage.setItem("courses", JSON.stringify(updatedCourses));
-  };
- 
-  // Electron'dan CSV verisi dinleme
+
   useEffect(() => {
     window.electronAPI?.onCsvData((data) => {
       const newCourses = data.map((course, index) => {
-        // TimeToStart kolonundaki veriyi parçalama (örnek: "Monday 8:30")
-        const timeMatch = course.TimeToStart?.match(/(\w+)\s+(\d{1,2}:\d{2})/);
-        const day = timeMatch ? timeMatch[1] : ""; // Gün kısmı
-        const hour = timeMatch ? timeMatch[2] : ""; // Saat kısmı
- 
+        // Sütun anahtarlarını normalize ederek küçük harf yap
+        const normalizedCourse = Object.keys(course).reduce((acc, key) => {
+          acc[key.toLowerCase()] = course[key];
+          return acc;
+        }, {});
+
+        // TimeToStart ve DurationInLectureHours ayrıştırma
+        const timeMatch =
+          normalizedCourse["timetostart"] &&
+          normalizedCourse["timetostart"].match(/(\w+)\s+(\d{1,2}:\d{2})/);
+
+        const day = timeMatch ? timeMatch[1] : "N/A";
+        const hour = timeMatch ? timeMatch[2] : "N/A";
+
         return {
           id: Date.now() + index,
-          courseName: course.Course || "Unnamed Course", // Kurs adı
-          teacherName: course.Lecturer || "Unknown Lecturer", // Öğretmen adı
-          day: day, // Parçalanan gün
-          hour: hour, // Parçalanan saat
-          duration: course.DurationInLectureHours || "1", // Duration değeri (default: 1)
-          students: course.Students
-            ? course.Students.split(",").map((s) => s.trim())
-            : [], // Virgülle ayrılan öğrenci isimlerini diziye çevir
+          courseName: normalizedCourse["course"] || "Unnamed Course",
+          teacherName: normalizedCourse["lecturer"] || "Unknown Lecturer",
+          day: day,
+          hour: hour,
+          duration: normalizedCourse["durationinlecturehours"]?.trim() || "N/A",
+          students: normalizedCourse["students"]
+            ? normalizedCourse["students"].split(",").map((s) => s.trim())
+            : [],
         };
       });
- 
-      // Mevcut verilerle birleştirme, yinelenenleri engelleme
-      const combinedCourses = [...courses];
-      newCourses.forEach((newCourse) => {
-        const exists = combinedCourses.some(
-          (course) =>
-            course.courseName === newCourse.courseName &&
-            course.teacherName === newCourse.teacherName &&
-            course.day === newCourse.day &&
-            course.hour === newCourse.hour
-        );
-        if (!exists) {
-          combinedCourses.push(newCourse);
-        }
+
+      setCourses((prevCourses) => {
+        const combinedCourses = [...prevCourses];
+
+        newCourses.forEach((newCourse) => {
+          const exists = combinedCourses.some(
+            (course) =>
+              course.courseName === newCourse.courseName &&
+              course.teacherName === newCourse.teacherName &&
+              course.day === newCourse.day &&
+              course.hour === newCourse.hour
+          );
+
+          if (!exists) combinedCourses.push(newCourse);
+        });
+
+        localStorage.setItem("courses", JSON.stringify(combinedCourses));
+        return combinedCourses;
       });
- 
-      setCourses(combinedCourses);
-      localStorage.setItem("courses", JSON.stringify(combinedCourses));
     });
-  }, [courses]);
- 
+  }, []);
+
   return (
-    <CoursesContext.Provider value={{ courses, addCourse, deleteCourse }}>
+    <CoursesContext.Provider value={{ courses }}>
       {children}
     </CoursesContext.Provider>
   );
 };
- 
+
 export default CoursesProvider;
- 
- 

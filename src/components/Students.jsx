@@ -2,14 +2,14 @@ import React, { useState, useEffect, useContext } from "react";
 import { ClassroomContext } from "../context/ClassroomContext";
 import WeeklySchedule from "./WeeklySchedule";
 import "./StudentManagement.css";
- 
+
 function Students() {
   const { classrooms } = useContext(ClassroomContext);
   const [students, setStudents] = useState([]);
   const [search, setSearch] = useState("");
   const [newStudent, setNewStudent] = useState("");
   const [selectedStudent, setSelectedStudent] = useState(null);
- 
+
   // Load students from localStorage on component mount
   useEffect(() => {
     const storedStudents = localStorage.getItem("students");
@@ -17,14 +17,14 @@ function Students() {
       setStudents(JSON.parse(storedStudents));
     }
   }, []);
- 
+
   // Save students to localStorage whenever the students state changes
   useEffect(() => {
     if (students.length > 0) {
       localStorage.setItem("students", JSON.stringify(students));
     }
   }, [students]);
- 
+
   // Add a new student
   const addStudent = () => {
     if (newStudent.trim()) {
@@ -37,23 +37,23 @@ function Students() {
       setNewStudent("");
     }
   };
- 
+
   // Delete a student
   const deleteStudent = (id) => {
     setStudents((prevStudents) =>
       prevStudents.filter((student) => student.id !== id)
     );
   };
- 
+
   // Filter students based on search input
   const filteredStudents = students.filter((student) =>
     student.name.toLowerCase().includes(search.toLowerCase())
   );
- 
+
   return (
     <div className="container">
       <h2>Student Management</h2>
- 
+
       {!selectedStudent && (
         <>
           <div className="form-group">
@@ -65,7 +65,7 @@ function Students() {
             />
             <button onClick={addStudent}>Add Student</button>
           </div>
- 
+
           <input
             type="text"
             placeholder="Search student"
@@ -74,7 +74,7 @@ function Students() {
           />
         </>
       )}
- 
+
       {!selectedStudent && (
         <ul>
           {filteredStudents.map((student) => (
@@ -92,7 +92,7 @@ function Students() {
           ))}
         </ul>
       )}
- 
+
       {selectedStudent && (
         <WeeklySchedule
           student={selectedStudent}
@@ -111,7 +111,5 @@ function Students() {
     </div>
   );
 }
- 
+
 export default Students;
- 
- 
