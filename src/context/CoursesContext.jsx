@@ -70,6 +70,33 @@ const CoursesProvider = ({ children }) => {
     </CoursesContext.Provider>
   );
 };
+
+const autoAssignClassrooms = (classrooms) => {
+  const updatedCourses = courses.map((course) => {
+    let assigned = false;
+
+    // Sınıfları gez ve uygun sınıfı bul
+    for (const classroom of classrooms) {
+      if (classroom.capacity >= course.capacity && !classroom.isOccupied) {
+        course.classroom = classroom.name;
+        classroom.isOccupied = true; // Sınıfı işaretle
+        assigned = true;
+        break;
+      }
+    }
+
+    // Eğer uygun sınıf bulunamazsa uyarı ekle
+    if (!assigned) {
+      course.classroom = "No Available Classroom";
+    }
+
+    return course;
+  });
+
+  setCourses(updatedCourses);
+  localStorage.setItem("courses", JSON.stringify(updatedCourses));
+};
+
  
 export default CoursesProvider;
  
