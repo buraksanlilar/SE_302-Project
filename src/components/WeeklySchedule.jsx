@@ -8,14 +8,12 @@ function WeeklySchedule({ student, updateSchedule }) {
     student.weeklySchedule ||
       Array.from({ length: 16 }, () => Array(5).fill(null))
   );
-  const [selectedCell, setSelectedCell] = useState(null);
   const [selectedCourse, setSelectedCourse] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
   const timeSlots = generateTimeSlots();
 
-  // Zaman slotlarını oluştur
   function generateTimeSlots() {
     const slots = [];
     let hour = 8;
@@ -26,12 +24,12 @@ function WeeklySchedule({ student, updateSchedule }) {
         2,
         "0"
       )}`;
+      slots.push(start.trim()); // Normalleştir: Fazladan boşlukları kaldır
       minute += 45;
       if (minute >= 60) {
         hour += 1;
         minute -= 60;
       }
-      slots.push(`${start}`);
       minute += 10;
       if (minute >= 60) {
         hour += 1;
@@ -41,41 +39,62 @@ function WeeklySchedule({ student, updateSchedule }) {
     return slots;
   }
 
-  // Hücreye tıklama işlemi
-  const handleCellClick = (rowIndex, colIndex) => {
-    setSelectedCell({ rowIndex, colIndex });
-    setSelectedCourse("");
-    setErrorMessage("");
-  };
-
-  // Kurs seçimi ve tabloya ekleme
-  const selectCourse = () => {
+  const placeCourseAutomatically = () => {
     if (!selectedCourse) {
-      setErrorMessage("Please select a valid course.");
+      setErrorMessage("Please select a course.");
       return;
     }
 
-    const updatedSchedule = schedule.map((row, rowIndex) =>
-      row.map((cell, colIndex) =>
-        rowIndex === selectedCell.rowIndex && colIndex === selectedCell.colIndex
-          ? selectedCourse
-          : cell
-      )
-    );
+    const course = courses.find((c) => c.courseName === selectedCourse);
 
-    setSchedule(updatedSchedule);
-    setSelectedCell(null);
-    setSelectedCourse("");
+    // Kurs verisinin doğru olduğunu kontrol et
+    if (!course || !course.day || !course.hour || !course.duration) {
+      setErrorMessage("Invalid course data.");
+      return;
+    }
+
+    // Gün ve saat bilgisini parçala
+    const dayIndex = days.indexOf(course.day);
+    const normalizedHour = course.hour.trim().padStart(5, "0");
+    const startSlot = timeSlots.findIndex((slot) => slot === normalizedHour);
+    console.log("Normalized Hour:", normalizedHour);
+
+    if (dayIndex === -1 || startSlot === -1) {
+      setErrorMessage("Invalid day or time in course data.");
+      return;
+    }
+
+    const updatedSchedule = schedule.map((row) => [...row]);
+    let conflict = false;
+
+    // Kursun duration değerini alarak zaman slotlarını doldur
+    for (let i = 0; i < parseInt(course.duration, 10); i++) {
+      const currentSlot = startSlot + i;
+      if (currentSlot >= updatedSchedule.length) {
+        setErrorMessage("Course duration exceeds available time slots.");
+        return;
+      }
+      if (updatedSchedule[currentSlot][dayIndex] !== null) {
+        conflict = true;
+        break;
+      }
+    }
+
+    if (conflict) {
+      setErrorMessage("There is already a course scheduled in this time slot.");
+    } else {
+      for (let i = 0; i < parseInt(course.duration, 10); i++) {
+        const currentSlot = startSlot + i;
+        updatedSchedule[currentSlot][dayIndex] = course.courseName;
+      }
+      setSchedule(updatedSchedule);
+      setErrorMessage("");
+    }
   };
 
   // Save Schedule Butonu
   const saveSchedule = () => {
-    if (!updateSchedule) {
-      console.error("updateSchedule fonksiyonu tanımlı değil!");
-      return;
-    }
-    console.log("Saving Schedule:", schedule);
-    updateSchedule(schedule); // Güncellenmiş programı ebeveyn bileşene gönder
+    updateSchedule(schedule);
     alert("Schedule saved successfully!");
   };
 
@@ -83,8 +102,25 @@ function WeeklySchedule({ student, updateSchedule }) {
     <div className="schedule-container">
       <h3>Weekly Schedule for {student.name}</h3>
 
+      {/* Ders Seçme Bölümü */}
+      <div className="course-select">
+        <select
+          value={selectedCourse}
+          onChange={(e) => setSelectedCourse(e.target.value)}
+        >
+          <option value="">Select a Course</option>
+          {courses.map((course) => (
+            <option key={course.id} value={course.courseName}>
+              {`${course.courseName} | Day: ${course.day} | Time: ${course.hour} | Duration: ${course.duration}`}
+            </option>
+          ))}
+        </select>
+        <button onClick={placeCourseAutomatically}>Place Course</button>
+      </div>
+
       {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
 
+      {/* Haftalık Program Tablosu */}
       <div className="table-container">
         <table>
           <thead>
@@ -100,47 +136,13 @@ function WeeklySchedule({ student, updateSchedule }) {
               <tr key={rowIndex}>
                 <td>{timeSlots[rowIndex]}</td>
                 {row.map((course, colIndex) => (
-                  <td
-                    key={colIndex}
-                    onClick={() => handleCellClick(rowIndex, colIndex)}
-                    style={{
-                      cursor: "pointer",
-                      background:
-                        selectedCell?.rowIndex === rowIndex &&
-                        selectedCell?.colIndex === colIndex
-                          ? "#d3d3d3"
-                          : "transparent",
-                    }}
-                  >
-                    {course || "-"}
-                  </td>
+                  <td key={colIndex}>{course || "-"}</td>
                 ))}
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-
-      {selectedCell && (
-        <div className="modal">
-          <h4>Select Course</h4>
-          <select
-            value={selectedCourse}
-            onChange={(e) => setSelectedCourse(e.target.value)}
-          >
-            <option value="">Select a Course</option>
-            {courses.map((course) => (
-              <option key={course.id} value={course.courseName}>
-                {`${course.courseName} | Day: ${course.day} | Time: ${
-                  course.hour || "N/A"
-                } | Duration: ${course.duration}`}
-              </option>
-            ))}
-          </select>
-          <button onClick={selectCourse}>Save</button>
-          <button onClick={() => setSelectedCell(null)}>Cancel</button>
-        </div>
-      )}
 
       <button onClick={saveSchedule}>Save Schedule</button>
     </div>

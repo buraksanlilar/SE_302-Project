@@ -11,16 +11,16 @@ const CoursesProvider = ({ children }) => {
   useEffect(() => {
     window.electronAPI?.onCsvData((data) => {
       const newCourses = data.map((course, index) => {
-        // Sütun anahtarlarını normalize ederek küçük harf yap
         const normalizedCourse = Object.keys(course).reduce((acc, key) => {
           acc[key.toLowerCase()] = course[key];
           return acc;
         }, {});
 
-        // TimeToStart ve DurationInLectureHours ayrıştırma
         const timeMatch =
           normalizedCourse["timetostart"] &&
-          normalizedCourse["timetostart"].match(/(\w+)\s+(\d{1,2}:\d{2})/);
+          normalizedCourse["timetostart"]
+            .trim()
+            .match(/(\w+)\s+(\d{1,2}:\d{2})/);
 
         const day = timeMatch ? timeMatch[1] : "N/A";
         const hour = timeMatch ? timeMatch[2] : "N/A";
@@ -29,9 +29,11 @@ const CoursesProvider = ({ children }) => {
           id: Date.now() + index,
           courseName: normalizedCourse["course"] || "Unnamed Course",
           teacherName: normalizedCourse["lecturer"] || "Unknown Lecturer",
-          day: day,
-          hour: hour,
+          day: day, // Gün
+          hour: hour, // Saat
           duration: normalizedCourse["durationinlecturehours"]?.trim() || "N/A",
+          classroom: normalizedCourse["classroom"] || "Unknown Classroom", // Yeni alan: classroom
+          courseCode: normalizedCourse["coursecode"] || "N/A", // Yeni alan: course code
           students: normalizedCourse["students"]
             ? normalizedCourse["students"].split(",").map((s) => s.trim())
             : [],
@@ -59,8 +61,26 @@ const CoursesProvider = ({ children }) => {
     });
   }, []);
 
+  // Yeni kurs ekleme fonksiyonu
+  const addCourse = (newCourse) => {
+    setCourses((prevCourses) => {
+      const updatedCourses = [...prevCourses, newCourse];
+      localStorage.setItem("courses", JSON.stringify(updatedCourses));
+      return updatedCourses;
+    });
+  };
+
+  // Kurs silme fonksiyonu
+  const deleteCourse = (id) => {
+    setCourses((prevCourses) => {
+      const updatedCourses = prevCourses.filter((course) => course.id !== id);
+      localStorage.setItem("courses", JSON.stringify(updatedCourses));
+      return updatedCourses;
+    });
+  };
+
   return (
-    <CoursesContext.Provider value={{ courses }}>
+    <CoursesContext.Provider value={{ courses, addCourse, deleteCourse }}>
       {children}
     </CoursesContext.Provider>
   );
