@@ -33,28 +33,30 @@ function createWindow() {
           click: async () => {
             var _a;
             const result = await dialog.showOpenDialog({
-              properties: ["openFile"],
+              properties: ["openFile", "multiSelections"],
               filters: [{ name: "Comma Separated Values (CSV)", extensions: ["csv"] }]
             });
             if (!result.canceled && result.filePaths.length > 0) {
-              const filePath = result.filePaths[0];
-              const fileContent = fs.readFileSync(filePath, "utf-8");
-              const lines = fileContent.split("\n").filter((line) => line.trim() !== "");
-              const headers = (_a = lines.shift()) == null ? void 0 : _a.split(";").map((h) => h.trim());
-              if (!headers) {
-                console.error("CSV dosyasında header bulunamadı.");
-                return;
+              const classroomData = [];
+              const coursesData = [];
+              for (const filePath of result.filePaths) {
+                const fileContent = fs.readFileSync(filePath, "utf-8");
+                const lines = fileContent.split("\n").filter((line) => line.trim() !== "");
+                const headers = (_a = lines.shift()) == null ? void 0 : _a.split(";").map((h) => h.trim());
+                if (!headers) {
+                  console.error(`Header bulunamadı: ${filePath}`);
+                  continue;
+                }
+                if (headers.includes("Classroom") && headers.includes("Capacity")) {
+                  console.log(`Classroom dosyası bulundu: ${filePath}`);
+                  classroomData.push(...parseCsv(lines, headers));
+                } else if (headers.includes("Course") && headers.includes("TimeToStart")) {
+                  console.log(`Courses dosyası bulundu: ${filePath}`);
+                  coursesData.push(...parseCsv(lines, headers));
+                }
               }
-              const jsonData = lines.map((line) => line.split(";")).filter((cols) => cols.some((col) => col.trim() !== "")).map((line) => {
-                const obj = {};
-                headers.forEach((header, index) => {
-                  var _a2;
-                  obj[header] = ((_a2 = line[index]) == null ? void 0 : _a2.trim()) || "";
-                });
-                return obj;
-              });
-              console.log("Processed CSV Data:", jsonData);
-              win == null ? void 0 : win.webContents.send("csv-data", jsonData);
+              win == null ? void 0 : win.webContents.send("classroom-data", classroomData);
+              win == null ? void 0 : win.webContents.send("courses-data", coursesData);
             }
           }
         },
@@ -100,6 +102,17 @@ app.on("activate", () => {
     createWindow();
   }
 });
+function parseCsv(lines, headers) {
+  return lines.map((line) => {
+    const cols = line.split(";");
+    const obj = {};
+    headers.forEach((header, index) => {
+      var _a;
+      obj[header.toLowerCase()] = ((_a = cols[index]) == null ? void 0 : _a.trim()) || "";
+    });
+    return obj;
+  });
+}
 app.whenReady().then(createWindow);
 export {
   MAIN_DIST,

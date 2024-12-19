@@ -7,10 +7,9 @@ const CoursesProvider = ({ children }) => {
     const savedCourses = JSON.parse(localStorage.getItem("courses"));
     return savedCourses || [];
   });
-  
 
   useEffect(() => {
-    window.electronAPI?.onCsvData((data) => {
+    const handleCoursesData = (event, data) => {
       const newCourses = data.map((course, index) => {
         const normalizedCourse = Object.keys(course).reduce((acc, key) => {
           acc[key.toLowerCase()] = course[key];
@@ -59,7 +58,13 @@ const CoursesProvider = ({ children }) => {
         localStorage.setItem("courses", JSON.stringify(combinedCourses));
         return combinedCourses;
       });
-    });
+    };
+
+    window.electronAPI?.on("courses-data", handleCoursesData);
+
+    return () => {
+      window.electronAPI?.off("courses-data", handleCoursesData);
+    };
   }, []);
 
   // Yeni kurs ekleme fonksiyonu
@@ -86,6 +91,7 @@ const CoursesProvider = ({ children }) => {
     </CoursesContext.Provider>
   );
 };
+
 const autoAssignClassrooms = (classrooms) => {
   const updatedCourses = courses.map((course) => {
     let assigned = false;
@@ -111,6 +117,5 @@ const autoAssignClassrooms = (classrooms) => {
   setCourses(updatedCourses);
   localStorage.setItem("courses", JSON.stringify(updatedCourses));
 };
-
 
 export default CoursesProvider;

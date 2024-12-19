@@ -3,7 +3,8 @@ import { ClassroomContext } from "../context/ClassroomContext";
 import "./Classrooms.css";
 
 function Classrooms() {
-  const { classrooms, addClassroom, deleteClassroom } = useContext(ClassroomContext);
+  const { classrooms, addClassroom, deleteClassroom } =
+    useContext(ClassroomContext);
   const [newClassroom, setNewClassroom] = useState("");
   const [capacity, setCapacity] = useState("");
 
@@ -39,7 +40,9 @@ function Classrooms() {
         {classrooms.map((classroom) => (
           <li key={classroom.id}>
             {classroom.name} - Capacity: {classroom.capacity}
-            <button onClick={() => deleteClassroom(classroom.id)}>Delete</button>
+            <button onClick={() => deleteClassroom(classroom.id)}>
+              Delete
+            </button>
           </li>
         ))}
       </ul>

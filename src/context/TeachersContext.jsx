@@ -75,10 +75,10 @@ const TeachersContextProvider = ({ children }) => {
       }
     };
 
-    window.electronAPI?.on("csv-data", handleCsvData);
+    window.electronAPI?.on("courses-data", handleCsvData);
 
     return () => {
-      window.electronAPI?.off("csv-data", handleCsvData);
+      window.electronAPI?.off("courses-data", handleCsvData);
     };
   }, []);
 

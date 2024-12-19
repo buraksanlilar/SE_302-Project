@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { ClassroomContext } from "../context/ClassroomContext";
-import WeeklySchedule from "./WeeklySchedule";
+import WeeklySchedule from "./weeklySchedule";
 import "./StudentManagement.css";
 
 function Students() {
