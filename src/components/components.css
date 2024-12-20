@@ -172,3 +172,29 @@
   border-color: #3498db;
   outline: none;
 }
+/* Auto Assign Butonu */
+.auto-assign-button {
+  background-color: #2ecc71; /* Yeşil arka plan */
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 4px;
+  margin-left: 10px; /* Butonlar arasında boşluk */
+  transition: background-color 0.3s ease;
+}
+
+.auto-assign-button:hover {
+  background-color: #27ae60; /* Daha koyu yeşil hover efekti */
+}
+
+/* Button Group */
+.button-group {
+  display: flex;
+  gap: 10px; /* Butonlar arasında boşluk bırakır */
+  justify-content: flex-start;
+  margin-bottom: 15px;
+}
+
+

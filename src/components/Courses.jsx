@@ -5,13 +5,13 @@ import { ClassroomContext } from "../context/ClassroomContext";
 import "./components.css";
 
 function Courses() {
-  const { courses, addCourse, deleteCourse } = useContext(CoursesContext);
+  const { courses, addCourse, deleteCourse, updateCourse } = useContext(CoursesContext);
   const { teachers } = useContext(TeachersContext);
   const { classrooms } = useContext(ClassroomContext);
 
   const [newCourse, setNewCourse] = useState("");
-  const [selectedTeacher, setSelectedTeacher] = useState("");
   const [selectedClassroom, setSelectedClassroom] = useState("");
+  const [selectedTeacher, setSelectedTeacher] = useState("");
   const [selectedDay, setSelectedDay] = useState("");
   const [selectedHour, setSelectedHour] = useState("");
   const [duration, setDuration] = useState("");
@@ -22,40 +22,29 @@ function Courses() {
     "14:50", "15:45", "16:40", "17:40", "18:35", "19:30", "20:25", "21:20"
   ];
 
-  // Çakışma kontrolü
-  const checkForConflicts = () => {
-    return courses.some((course) => {
-      if (
-        course.classroom === selectedClassroom &&
-        course.day === selectedDay
-      ) {
-        const existingHourIndex = hours.indexOf(course.hour);
-        const newHourIndex = hours.indexOf(selectedHour);
-        const courseDuration = parseInt(course.duration) || 1;
-        const newDuration = parseInt(duration) || 1;
+  // Auto Assign Fonksiyonu
+  const autoAssignCourses = () => {
+    const updatedCourses = courses.map((course) => {
+      if (!course.classroom) {
+        const suitableClassroom = classrooms.find((classroom) => {
+          if (classroom.capacity < (course.students?.length || 0)) return false;
+          return true;
+        });
 
-        // Yeni dersin zaman dilimiyle mevcut dersin zaman dilimi çakışıyor mu kontrol et
-        for (let i = 0; i < courseDuration; i++) {
-          for (let j = 0; j < newDuration; j++) {
-            if (existingHourIndex + i === newHourIndex + j) {
-              return true;
-            }
-          }
+        if (suitableClassroom) {
+          course.classroom = suitableClassroom.name;
         }
       }
-      return false;
+      return course;
     });
+
+    updateCourse(updatedCourses);
+    alert("Auto Assign completed successfully!");
   };
 
-  // Yeni ders ekleme
   const handleAddCourse = () => {
-    if (!newCourse || !selectedTeacher || !selectedDay || !selectedHour || !duration) {
+    if (!newCourse || !selectedTeacher || !selectedClassroom || !selectedDay || !selectedHour || !duration) {
       alert("Please fill in all fields!");
-      return;
-    }
-
-    if (checkForConflicts()) {
-      alert("There is a scheduling conflict! This classroom already has a course at the selected time.");
       return;
     }
 
@@ -70,8 +59,6 @@ function Courses() {
     };
 
     addCourse(newCourseData);
-
-    // Inputları temizle
     setNewCourse("");
     setSelectedTeacher("");
     setSelectedClassroom("");
@@ -84,6 +71,7 @@ function Courses() {
     <div className="container">
       <h3>Manage Courses</h3>
 
+      {/* Form */}
       <input
         type="text"
         placeholder="Course Name"
@@ -91,20 +79,27 @@ function Courses() {
         onChange={(e) => setNewCourse(e.target.value)}
       />
 
-      <select value={selectedTeacher} onChange={(e) => setSelectedTeacher(e.target.value)}>
-        <option value="">Select Teacher</option>
-        {teachers.map((teacher) => (
-          <option key={teacher.id} value={teacher.name}>{teacher.name}</option>
-        ))}
-      </select>
-
+      {/* Select Classroom */}
       <select value={selectedClassroom} onChange={(e) => setSelectedClassroom(e.target.value)}>
         <option value="">Select Classroom</option>
         {classrooms.map((classroom) => (
-          <option key={classroom.id} value={classroom.name}>{classroom.name}</option>
+          <option key={classroom.id} value={classroom.name}>
+            {classroom.name}
+          </option>
         ))}
       </select>
 
+      {/* Select Teacher */}
+      <select value={selectedTeacher} onChange={(e) => setSelectedTeacher(e.target.value)}>
+        <option value="">Select Teacher</option>
+        {teachers.map((teacher) => (
+          <option key={teacher.id} value={teacher.name}>
+            {teacher.name}
+          </option>
+        ))}
+      </select>
+
+      {/* Select Day */}
       <select value={selectedDay} onChange={(e) => setSelectedDay(e.target.value)}>
         <option value="">Select Day</option>
         {days.map((day) => (
@@ -112,6 +107,7 @@ function Courses() {
         ))}
       </select>
 
+      {/* Select Hour */}
       <select value={selectedHour} onChange={(e) => setSelectedHour(e.target.value)}>
         <option value="">Select Hour</option>
         {hours.map((hour) => (
@@ -119,6 +115,7 @@ function Courses() {
         ))}
       </select>
 
+      {/* Duration */}
       <input
         type="number"
         placeholder="Duration (hours)"
@@ -127,14 +124,19 @@ function Courses() {
         onChange={(e) => setDuration(e.target.value)}
       />
 
-      <button onClick={handleAddCourse}>Add Course</button>
+      {/* Button Group */}
+      <div className="button-group">
+        <button onClick={handleAddCourse}>Add Course</button>
+        <button className="auto-assign-button" onClick={autoAssignCourses}>Auto Assign</button>
+      </div>
 
+      {/* Kurs Listesi */}
       <ul>
         {courses.map((course) => (
           <li key={course.id}>
             {course.courseName} | {course.teacherName} | {course.day} | {course.hour} | 
-            Classroom: {course.classroom} | Duration: {course.duration} hours
-            <button onClick={() => deleteCourse(course.id)}>Delete</button>
+            Classroom: {course.classroom || "Not Assigned"} | Duration: {course.duration} hours
+            <button className="delete-button" onClick={() => deleteCourse(course.id)}>Delete</button>
           </li>
         ))}
       </ul>
