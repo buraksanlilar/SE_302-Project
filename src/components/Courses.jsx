@@ -5,8 +5,9 @@ import { ClassroomContext } from "../context/ClassroomContext";
 import "./components.css";
 
 function Courses() {
-  const { courses, addCourse, deleteCourse, updateCourse } = useContext(CoursesContext);
-  const { teachers } = useContext(TeachersContext);
+  const { courses, addCourse, deleteCourse, updateCourse } =
+    useContext(CoursesContext);
+  const { teachers, addTeacher } = useContext(TeachersContext);
   const { classrooms } = useContext(ClassroomContext);
 
   const [newCourse, setNewCourse] = useState("");
@@ -18,8 +19,20 @@ function Courses() {
 
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
   const hours = [
-    "08:30", "09:25", "10:20", "11:15", "13:00", "13:55",
-    "14:50", "15:45", "16:40", "17:40", "18:35", "19:30", "20:25", "21:20"
+    "08:30",
+    "09:25",
+    "10:20",
+    "11:15",
+    "13:00",
+    "13:55",
+    "14:50",
+    "15:45",
+    "16:40",
+    "17:40",
+    "18:35",
+    "19:30",
+    "20:25",
+    "21:20",
   ];
 
   // Auto Assign Fonksiyonu
@@ -43,7 +56,14 @@ function Courses() {
   };
 
   const handleAddCourse = () => {
-    if (!newCourse || !selectedTeacher || !selectedClassroom || !selectedDay || !selectedHour || !duration) {
+    if (
+      !newCourse ||
+      !selectedTeacher ||
+      !selectedClassroom ||
+      !selectedDay ||
+      !selectedHour ||
+      !duration
+    ) {
       alert("Please fill in all fields!");
       return;
     }
@@ -80,7 +100,10 @@ function Courses() {
       />
 
       {/* Select Classroom */}
-      <select value={selectedClassroom} onChange={(e) => setSelectedClassroom(e.target.value)}>
+      <select
+        value={selectedClassroom}
+        onChange={(e) => setSelectedClassroom(e.target.value)}
+      >
         <option value="">Select Classroom</option>
         {classrooms.map((classroom) => (
           <option key={classroom.id} value={classroom.name}>
@@ -90,7 +113,10 @@ function Courses() {
       </select>
 
       {/* Select Teacher */}
-      <select value={selectedTeacher} onChange={(e) => setSelectedTeacher(e.target.value)}>
+      <select
+        value={selectedTeacher}
+        onChange={(e) => setSelectedTeacher(e.target.value)}
+      >
         <option value="">Select Teacher</option>
         {teachers.map((teacher) => (
           <option key={teacher.id} value={teacher.name}>
@@ -100,18 +126,28 @@ function Courses() {
       </select>
 
       {/* Select Day */}
-      <select value={selectedDay} onChange={(e) => setSelectedDay(e.target.value)}>
+      <select
+        value={selectedDay}
+        onChange={(e) => setSelectedDay(e.target.value)}
+      >
         <option value="">Select Day</option>
         {days.map((day) => (
-          <option key={day} value={day}>{day}</option>
+          <option key={day} value={day}>
+            {day}
+          </option>
         ))}
       </select>
 
       {/* Select Hour */}
-      <select value={selectedHour} onChange={(e) => setSelectedHour(e.target.value)}>
+      <select
+        value={selectedHour}
+        onChange={(e) => setSelectedHour(e.target.value)}
+      >
         <option value="">Select Hour</option>
         {hours.map((hour) => (
-          <option key={hour} value={hour}>{hour}</option>
+          <option key={hour} value={hour}>
+            {hour}
+          </option>
         ))}
       </select>
 
@@ -127,16 +163,24 @@ function Courses() {
       {/* Button Group */}
       <div className="button-group">
         <button onClick={handleAddCourse}>Add Course</button>
-        <button className="auto-assign-button" onClick={autoAssignCourses}>Auto Assign</button>
+        <button className="auto-assign-button" onClick={autoAssignCourses}>
+          Auto Assign
+        </button>
       </div>
 
       {/* Kurs Listesi */}
       <ul>
         {courses.map((course) => (
           <li key={course.id}>
-            {course.courseName} | {course.teacherName} | {course.day} | {course.hour} | 
-            Classroom: {course.classroom || "Not Assigned"} | Duration: {course.duration} hours
-            <button className="delete-button" onClick={() => deleteCourse(course.id)}>Delete</button>
+            {course.courseName} | {course.teacherName} | {course.day} |{" "}
+            {course.hour} | Classroom: {course.classroom || "Not Assigned"} |
+            Duration: {course.duration} hours
+            <button
+              className="delete-button"
+              onClick={() => deleteCourse(course.id)}
+            >
+              Delete
+            </button>
           </li>
         ))}
       </ul>
