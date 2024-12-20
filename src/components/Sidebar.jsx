@@ -1,10 +1,10 @@
 import React from "react";
-import "./sidebar.css";
+import "./Sidebar.css";
 
 function Sidebar({ activeTab, setActiveTab }) {
   return (
     <div className="sidebar">
-      <h3 className="sidebar-title">School SM</h3>
+      <h3 className="sidebar-title">SCHOOL SM</h3>
       <ul className="sidebar-menu">
         <li
           className={activeTab === "dashboard" ? "active" : ""}
@@ -36,7 +36,6 @@ function Sidebar({ activeTab, setActiveTab }) {
         >
           Courses
         </li>
-        {/* Subjects ve Invoices menülerini kaldırdık */}
       </ul>
     </div>
   );

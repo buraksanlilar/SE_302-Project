@@ -4,7 +4,6 @@
   background-color: #1a1a2e; /* Sidebar arka plan rengi */
   color: #ffffff; /* Metin rengi */
   height: 100vh;
-  padding: 0;
   display: flex;
   flex-direction: column;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
@@ -12,6 +11,7 @@
   left: 0;
   top: 0;
   z-index: 1000;
+  padding-top: 20px;
 }
 
 /* Sidebar Başlık */
@@ -19,63 +19,60 @@
   font-size: 22px;
   font-weight: bold;
   text-align: center;
-  margin: 0;
-  padding: 15px 0;
+  margin-bottom: 20px;
   color: #f5f6fa;
   text-transform: uppercase;
   letter-spacing: 2px;
-  border-bottom: 2px solid #f5f6fa;
 }
 
 /* Sidebar Menü */
 .sidebar-menu {
   list-style: none;
-  padding: 15px 0; /* Üstten ve alttan padding ekledik */
+  padding: 0;
   margin: 0;
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 10px; /* Öğeler arasında boşluk */
 }
 
 .sidebar-menu li {
-  margin: 0 10px; /* Kenar boşluğu */
+  margin: 10px;
   padding: 12px 15px;
-  border-radius: 8px; /* Hafif yuvarlak köşeler */
+  border-radius: 8px;
   cursor: pointer;
   font-size: 16px;
-  color: #cfcfcf;
+  color: #ffffff;
+  text-align: center;
+  background-color: #0f0b3d; /* İlk halindeki mavi ton */
   transition: all 0.3s ease;
-  text-transform: capitalize;
-  background-color: #0f0b3d; /* Rastgele bir başlangıç rengi gibi */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Hafif gölge */
 }
 
-/* Hover Efekti */
 .sidebar-menu li:hover {
-  background-color: #34495e; /* Daha koyu renk */
-  color: #ffffff;
-  transform: translateY(-2px); /* Hover'da hafif yukarı kaldır */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Gölgeli hover */
+  background-color: #34495e; /* Hover efekti */
+  transform: translateY(-2px);
 }
 
-/* Aktif Sekme */
 .sidebar-menu li.active {
-  background-color: #0f3460; /* Aktif sekme arka plan rengi */
-  color: #ffffff;
+  background-color: #0f3460; /* Aktif sekme rengi */
   font-weight: bold;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Daha belirgin gölge */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
-
-/* Disabled Sekmeler */
-.sidebar-menu li.disabled {
-  color: #2b2b4b;
-  background-color: transparent;
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-/* Smooth Geçiş */
 .sidebar-menu li {
-  transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+  margin: 10px;
+  padding: 12px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  color: #ffffff;
+  text-align: center;
+  background-color: #0f0b3d; /* Buton arka plan rengi */
+  border: 2px solid #ffffff; /* Beyaz kenarlık ekledik */
+  transition: all 0.3s ease;
+}
+
+.sidebar-menu li:hover {
+  background-color: #34495e; /* Hover efekti */
+  transform: translateY(-2px);
+}
+
+.sidebar-menu li.active {
+  background-color: #0f3460; /* Aktif sekme rengi */
+  font-weight: bold;
 }
