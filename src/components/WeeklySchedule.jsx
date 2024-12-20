@@ -24,7 +24,7 @@ function WeeklySchedule({ student, updateSchedule }) {
         2,
         "0"
       )}`;
-      slots.push(start.trim()); // Normalleştir: Fazladan boşlukları kaldır
+      slots.push(start.trim());
       minute += 45;
       if (minute >= 60) {
         hour += 1;
@@ -47,13 +47,11 @@ function WeeklySchedule({ student, updateSchedule }) {
 
     const course = courses.find((c) => c.courseName === selectedCourse);
 
-    // Kurs verisinin doğru olduğunu kontrol et
     if (!course || !course.day || !course.hour || !course.duration) {
       setErrorMessage("Invalid course data.");
       return;
     }
 
-    // Gün ve saat bilgisini parçala
     const dayIndex = days.indexOf(course.day);
     const normalizedHour = course.hour.trim().padStart(5, "0");
     const startSlot = timeSlots.findIndex((slot) => slot === normalizedHour);
@@ -67,7 +65,6 @@ function WeeklySchedule({ student, updateSchedule }) {
     const updatedSchedule = schedule.map((row) => [...row]);
     let conflict = false;
 
-    // Kursun duration değerini alarak zaman slotlarını doldur
     for (let i = 0; i < parseInt(course.duration, 10); i++) {
       const currentSlot = startSlot + i;
       if (currentSlot >= updatedSchedule.length) {
@@ -92,7 +89,6 @@ function WeeklySchedule({ student, updateSchedule }) {
     }
   };
 
-  // Save Schedule Butonu
   const saveSchedule = () => {
     updateSchedule(schedule);
     alert("Schedule saved successfully!");
@@ -102,7 +98,6 @@ function WeeklySchedule({ student, updateSchedule }) {
     <div className="schedule-container">
       <h3>Weekly Schedule for {student.name}</h3>
 
-      {/* Ders Seçme Bölümü */}
       <div className="course-select">
         <select
           value={selectedCourse}
@@ -120,7 +115,6 @@ function WeeklySchedule({ student, updateSchedule }) {
 
       {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
 
-      {/* Haftalık Program Tablosu */}
       <div className="table-container">
         <table>
           <thead>
