@@ -24,7 +24,7 @@
 }
 
 .schedule-button:hover {
-  background-color: #2980b9; /* Hover efekti */
+  background-color: #006eb7; /* Hover efekti */
 }
 
 /* Delete Butonu */
@@ -89,7 +89,7 @@ li:hover {
   padding: 8px 10px;
   font-size: 14px;
   margin-right: 10px;
-  border: 1px solid #ddd;
+  border: 1px solid #981d1d;
   border-radius: 4px;
 }
 
@@ -133,7 +133,8 @@ li:hover {
 }
 
 .modal-content h4 {
-  margin-bottom: 10px;
+  margin-bottom: 0px;
+  margin-top: -1px;
   font-size: 20px;
 }
 
