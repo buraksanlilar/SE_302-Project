@@ -39,17 +39,16 @@ const TeachersContextProvider = ({ children }) => {
     );
   };
 
-  // CSV'den gelen veriyi tekilleştir ve ekle
   useEffect(() => {
     const handleCsvData = (event, data) => {
+      console.log("Received data:", data); // Gelen veriyi kontrol et
       try {
-        if (data && data.length > 0) {
-          // Gelen veriyi tekilleştir
+        if (data && Array.isArray(data)) {
           const uniqueCsvTeachers = Array.from(
             new Set(
               data
-                .filter((teacher) => teacher.Lecturer?.trim())
-                .map((teacher) => teacher.Lecturer.trim().toLowerCase())
+                .filter((course) => course?.lecturer?.trim()) // Null check eklendi
+                .map((course) => course.lecturer.trim().toLowerCase())
             )
           );
 
@@ -58,15 +57,14 @@ const TeachersContextProvider = ({ children }) => {
               prevTeachers.map((t) => t.name.toLowerCase())
             );
 
-            // Tekilleştirilmiş yeni öğretmenleri ekle
             const newTeachers = uniqueCsvTeachers
-              .filter((name) => !existingNames.has(name)) // Duplicate olanları çıkar
+              .filter((name) => !existingNames.has(name))
               .map((name) => ({
-                id: Date.now() + Math.random(), // Benzersiz ID
-                name: name.charAt(0).toUpperCase() + name.slice(1), // İlk harfi büyük yap
+                id: Date.now() + Math.random(),
+                name: name.charAt(0).toUpperCase() + name.slice(1),
               }));
 
-            return [...prevTeachers, ...newTeachers]; // State'i güncelle
+            return [...prevTeachers, ...newTeachers];
           });
         }
       } catch (err) {
