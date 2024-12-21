@@ -2,6 +2,7 @@ import React, { useContext, useState } from "react";
 import { CoursesContext } from "../context/CoursesContext";
 import { TeachersContext } from "../context/TeachersContext";
 import { ClassroomContext } from "../context/ClassroomContext";
+import { StudentsContext } from "../context/StudentsContext";
 import "./Dashboard.css";
 import WeeklySchedule from "./weeklySchedule";
 
@@ -9,15 +10,15 @@ function Dashboard({ setActiveTab }) {
   const { classrooms } = useContext(ClassroomContext);
   const { teachers } = useContext(TeachersContext);
   const { courses } = useContext(CoursesContext);
+  const { students } = useContext(StudentsContext); // StudentsContext kullanımı eklendi
 
-  const [selectedCard, setSelectedCard] = useState(null); // Kart modal için
+  const [selectedCard, setSelectedCard] = useState(null);
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [selectedClassroom, setSelectedClassroom] = useState(null);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [classroomSearchQuery, setClassroomSearchQuery] = useState("");
 
-  const storedStudents = JSON.parse(localStorage.getItem("students")) || [];
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
   const hours = [
     "08:30", "09:25", "10:20", "11:15", "13:00", "13:55",
@@ -35,7 +36,7 @@ function Dashboard({ setActiveTab }) {
   );
 
   // Kursa kayıtlı öğrencileri filtrele
-  const courseStudents = storedStudents.filter((student) =>
+  const courseStudents = students.filter((student) =>
     student.weeklySchedule.some((row) =>
       row.some((entry) => entry && entry.includes(selectedCourse?.courseName))
     )
@@ -43,7 +44,9 @@ function Dashboard({ setActiveTab }) {
 
   // Sınıfın haftalık programını oluştur
   const getClassroomSchedule = (classroomName) => {
-    const schedule = Array.from({ length: hours.length }, () => Array(days.length).fill("-"));
+    const schedule = Array.from({ length: hours.length }, () =>
+      Array(days.length).fill("-")
+    );
 
     courses
       .filter((course) => course.classroom === classroomName)
@@ -69,7 +72,7 @@ function Dashboard({ setActiveTab }) {
       case "students":
         return (
           <ul>
-            {storedStudents.map((student) => (
+            {students.map((student) => (
               <li key={student.id}>{student.name}</li>
             ))}
           </ul>
@@ -115,7 +118,7 @@ function Dashboard({ setActiveTab }) {
       <div className="cards-container">
         <div className="card" onClick={() => setSelectedCard("students")}>
           <h3>Total Students</h3>
-          <p>{storedStudents.length}</p>
+          <p>{students.length}</p>
         </div>
         <div className="card" onClick={() => setSelectedCard("teachers")}>
           <h3>Total Teachers</h3>
@@ -131,77 +134,73 @@ function Dashboard({ setActiveTab }) {
         </div>
       </div>
 
-     {/* Attendance Section for Courses */}
-<div className="attendance-section">
-  <h3>Student Attendance by Course</h3>
-  {!selectedCourse ? (
-    <>
-      <input
-        type="text"
-        placeholder="Search Courses"
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-      />
-      {/* Scrollable List */}
-      <div className="scrollable-list">
-        <ul className="course-list">
-          {filteredCourses.map((course) => (
-            <li key={course.id}>
-              {course.courseName} - {course.teacherName}
-              <button onClick={() => setSelectedCourse(course)}>
-                View Students
-              </button>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </>
-  ) : (
-    <div className="course-students">
-      <h4>
-        Students Enrolled in {selectedCourse.courseName} (Teacher:{" "}
-        {selectedCourse.teacherName})
-      </h4>
-      <ul>
-        {courseStudents.map((student) => (
-          <li key={student.id}>
-            {student.name}
-            <button onClick={() => setSelectedStudent(student)}>
-              View Schedule
+      {/* Attendance Section */}
+      <div className="attendance-section">
+        <h3>Student Attendance by Course</h3>
+        {!selectedCourse ? (
+          <>
+            <input
+              type="text"
+              placeholder="Search Courses"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <div className="scrollable-list">
+              <ul className="course-list">
+                {filteredCourses.map((course) => (
+                  <li key={course.id}>
+                    {course.courseName} - {course.teacherName}
+                    <button onClick={() => setSelectedCourse(course)}>
+                      View Students
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </>
+        ) : (
+          <div className="course-students">
+            <h4>
+              Students Enrolled in {selectedCourse.courseName} (Teacher:{" "}
+              {selectedCourse.teacherName})
+            </h4>
+            <ul>
+              {courseStudents.map((student) => (
+                <li key={student.id}>
+                  {student.name}
+                  <button onClick={() => setSelectedStudent(student)}>
+                    View Schedule
+                  </button>
+                </li>
+              ))}
+            </ul>
+            <button className="back-button" onClick={() => setSelectedCourse(null)}>
+              Back
             </button>
-          </li>
-        ))}
-      </ul>
-      <button className="back-button" onClick={() => setSelectedCourse(null)}>
-        Back
-      </button>
-    </div>
-  )}
-</div>
-
-
-  {/* Classroom Schedule Section */}
-<div className="attendance-section">
-  <h3>Search by Classroom</h3>
-  <input
-    type="text"
-    placeholder="Search Classrooms"
-    value={classroomSearchQuery}
-    onChange={(e) => setClassroomSearchQuery(e.target.value)}
-  />
-  <div className="scrollable-list">
-    <ul className="classroom-list">
-      {filteredClassrooms.map((classroom) => (
-        <li key={classroom.id}>
-          {classroom.name} - Capacity: {classroom.capacity}
-          <button onClick={() => setSelectedClassroom(classroom)}>View Schedule</button>
-        </li>
-      ))}
-    </ul>
-  </div>
-</div>
-
-
+          </div>
+        )}
+      </div>
+      <div className="attendance-section">
+        <h3>Search by Classroom</h3>
+        <input
+          type="text"
+          placeholder="Search Classrooms"
+          value={classroomSearchQuery}
+          onChange={(e) => setClassroomSearchQuery(e.target.value)}
+        />
+        <div className="scrollable-list">
+          <ul className="classroom-list">
+            {filteredClassrooms.map((classroom) => (
+              <li key={classroom.id}>
+                {classroom.name} - Capacity: {classroom.capacity}
+                <button onClick={() => setSelectedClassroom(classroom)}>
+                  View Schedule
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
       {/* Weekly Schedule Modal for Classrooms */}
       {selectedClassroom && (
         <div className="modal-overlay">
@@ -231,42 +230,28 @@ function Dashboard({ setActiveTab }) {
             </table>
             <button onClick={() => setSelectedClassroom(null)}>Close</button>
           </div>
+          
         </div>
       )}
-
-      {/* WeeklySchedule Modal for Students */}
-      {selectedStudent && (
-        <div className="modal-overlay">
-          <div className="modal-content small-modal">
-            <h3>Weekly Schedule for {selectedStudent.name}</h3>
-            <WeeklySchedule
-              student={selectedStudent}
-              updateSchedule={(updatedSchedule) => {
-                const updatedStudents = storedStudents.map((s) =>
-                  s.id === selectedStudent.id
-                    ? { ...s, weeklySchedule: updatedSchedule }
-                    : s
-                );
-                localStorage.setItem("students", JSON.stringify(updatedStudents));
-                setSelectedStudent(null);
-              }}
-            />
-            <button onClick={() => setSelectedStudent(null)}>Close</button>
-          </div>
-        </div>
-      )}
-
-      {/* Modal for Cards */}
-      {selectedCard && (
+       {/* Modal for Cards */}
+       {selectedCard && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <h3>{selectedCard.charAt(0).toUpperCase() + selectedCard.slice(1)}</h3>
+            <h3>
+              {selectedCard.charAt(0).toUpperCase() + selectedCard.slice(1)}
+            </h3>
             {renderModalContent()}
-            <button className="close-button" onClick={() => setSelectedCard(null)}>Close</button>
+            <button
+              className="close-button"
+              onClick={() => setSelectedCard(null)}
+            >
+              Close
+            </button>
           </div>
         </div>
       )}
     </div>
+      
   );
 }
 

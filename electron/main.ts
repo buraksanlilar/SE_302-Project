@@ -132,11 +132,19 @@ function parseCsv(lines: string[], headers: string[]) {
   return lines.map((line) => {
     const cols = line.split(';');
     const obj: any = {};
+
     headers.forEach((header, index) => {
-      obj[header.toLowerCase()] = cols[index]?.trim() || '';
+      if (header.toLowerCase() === "students") {
+        // Students sütunundaki değerleri dizi olarak işleyelim
+        obj[header.toLowerCase()] = cols.slice(index).filter((student) => student.trim() !== '');
+      } else {
+        obj[header.toLowerCase()] = cols[index]?.trim() || '';
+      }
     });
+
     return obj;
   });
 }
+
 
 app.whenReady().then(createWindow);

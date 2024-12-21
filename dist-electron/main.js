@@ -108,7 +108,11 @@ function parseCsv(lines, headers) {
     const obj = {};
     headers.forEach((header, index) => {
       var _a;
-      obj[header.toLowerCase()] = ((_a = cols[index]) == null ? void 0 : _a.trim()) || "";
+      if (header.toLowerCase() === "students") {
+        obj[header.toLowerCase()] = cols.slice(index).filter((student) => student.trim() !== "");
+      } else {
+        obj[header.toLowerCase()] = ((_a = cols[index]) == null ? void 0 : _a.trim()) || "";
+      }
     });
     return obj;
   });

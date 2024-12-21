@@ -5,6 +5,7 @@ import Classrooms from "./components/Classrooms.jsx";
 import Teachers from "./components/Teachers.jsx";
 import Courses from "./components/Courses.jsx";
 import Dashboard from "./components/Dashboard.jsx";
+import StudentsProvider from "./context/StudentsContext";
 
 import { ClassroomProvider } from "./context/ClassroomContext";
 import TeachersContextProvider from "./context/TeachersContext.jsx";
@@ -16,6 +17,7 @@ function App() {
   const [activeTab, setActiveTab] = useState("dashboard");
 
   return (
+    <StudentsProvider>
     <TeachersContextProvider>
       <ClassroomProvider>
         <CoursesProvider>
@@ -33,6 +35,7 @@ function App() {
         </CoursesProvider>
       </ClassroomProvider>
     </TeachersContextProvider>
+    </StudentsProvider>
   );
 }
 

@@ -170,11 +170,11 @@ function Courses() {
 
       {/* Kurs Listesi */}
       <ul>
-        {courses.map((course) => (
-          <li key={course.id}>
-            {course.courseName} | {course.teacherName} | {course.day} |{" "}
-            {course.hour} | Classroom: {course.classroom || "Not Assigned"} |
-            Duration: {course.duration} hours
+  {courses.map((course) => (
+    <li key={course.id}>
+        {course.courseName} | {course.teacherName} | {course.day} |{" "}
+        {course.hour} | Classroom: {course.classroom || "Not Assigned"} |
+        Duration: {course.duration} hours
             <button
               className="delete-button"
               onClick={() => deleteCourse(course.id)}
@@ -184,6 +184,7 @@ function Courses() {
           </li>
         ))}
       </ul>
+
     </div>
   );
 }
