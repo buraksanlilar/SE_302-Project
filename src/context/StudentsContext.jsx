@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect } from "react";
+import { v4 as uuidv4 } from "uuid"; // UUID import
 
 // Context oluştur
 export const StudentsContext = createContext();
@@ -17,26 +18,33 @@ const StudentsContextProvider = ({ children }) => {
   }, [students]);
 
   // Yeni öğrenci ekleme fonksiyonu
+ 
+
+ 
+
   const addStudent = (newStudent) => {
     setStudents((prevStudents) => {
-      const existingNames = new Set(
-        prevStudents.map((s) => s.name.toLowerCase())
-      );
+      const existingNames = new Set(prevStudents.map((s) => s.name.toLowerCase()));
+  
       if (!existingNames.has(newStudent.name.toLowerCase())) {
         const updatedStudents = [
           ...prevStudents,
           {
-            id: Date.now(),
+            id: uuidv4(), // Benzersiz UUID
             name: newStudent.name.trim(),
             weeklySchedule: Array.from({ length: 16 }, () => Array(5).fill(null)),
           },
         ];
+  
         localStorage.setItem("students", JSON.stringify(updatedStudents));
         return updatedStudents;
       }
-      return prevStudents; // Duplicate kontrolü
+  
+      return prevStudents;
     });
   };
+  
+  
 
   // Öğrenci silme fonksiyonu
   const deleteStudent = (id) => {
@@ -48,7 +56,7 @@ const StudentsContextProvider = ({ children }) => {
   // CSV'den gelen veriyi işleme
   useEffect(() => {
     const handleCsvData = (event, data) => {
-      console.log("Received data:", data); // Gelen veriyi kontrol et
+      console.log("Received data:", data);
       try {
         if (data && Array.isArray(data)) {
           const uniqueCsvStudents = Array.from(
@@ -58,20 +66,20 @@ const StudentsContextProvider = ({ children }) => {
                 .flatMap((course) => course.students.map((s) => s.trim().toLowerCase()))
             )
           );
-
+    
           setStudents((prevStudents) => {
             const existingNames = new Set(
               prevStudents.map((s) => s.name.toLowerCase())
             );
-
+    
             const newStudents = uniqueCsvStudents
               .filter((name) => !existingNames.has(name))
               .map((name) => ({
-                id: Date.now() + Math.random(),
+                id: uuidv4(), // Benzersiz UUID
                 name: name.charAt(0).toUpperCase() + name.slice(1),
                 weeklySchedule: Array.from({ length: 16 }, () => Array(5).fill(null)),
               }));
-
+    
             const updatedStudents = [...prevStudents, ...newStudents];
             localStorage.setItem("students", JSON.stringify(updatedStudents));
             return updatedStudents;
@@ -82,6 +90,7 @@ const StudentsContextProvider = ({ children }) => {
         setError("Öğrenci verileri yüklenirken hata oluştu.");
       }
     };
+    
 
     window.electronAPI?.on("courses-data", handleCsvData);
 

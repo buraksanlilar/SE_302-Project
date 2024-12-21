@@ -25,9 +25,14 @@ function Students() {
     }
   };
 
-  const filteredStudents = students.filter((student) =>
-    student.name.toLowerCase().includes(search.toLowerCase())
-  );
+  const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+const filteredStudents = search.trim()
+  ? students.filter((student) =>
+      new RegExp(escapeRegex(search.trim()), "i").test(student.name.trim())
+    )
+  : students;
+
 
   return (
     <div className="container">
@@ -55,17 +60,19 @@ function Students() {
       )}
 
       {!selectedStudent && (
-        <ul>
-          {filteredStudents.map((student) => (
-            <li key={student.id}>
-              {student.name}
-              <div>
-                <button onClick={() => setSelectedStudent(student)}>Edit</button>
-                <button onClick={() => deleteStudent(student.id)}>Delete</button>
-              </div>
-            </li>
-          ))}
-        </ul>
+   <ul>
+   {filteredStudents.map((student) => (
+     <li key={student.id}>
+       {student.name}
+       <div>
+         <button onClick={() => setSelectedStudent(student)}>Edit</button>
+         <button onClick={() => deleteStudent(student.id)}>Delete</button>
+       </div>
+     </li>
+   ))}
+ </ul>
+ 
+      
       )}
 
       {selectedStudent && (
