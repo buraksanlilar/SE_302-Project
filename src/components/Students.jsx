@@ -60,8 +60,12 @@ function Students() {
             <li key={student.id}>
               {student.name}
               <div>
-                <button onClick={() => setSelectedStudent(student)}>Edit</button>
-                <button onClick={() => deleteStudent(student.id)}>Delete</button>
+                <button onClick={() => setSelectedStudent(student)}>
+                  Edit
+                </button>
+                <button onClick={() => deleteStudent(student.id)}>
+                  Delete
+                </button>
               </div>
             </li>
           ))}
@@ -73,7 +77,10 @@ function Students() {
           student={selectedStudent}
           classrooms={classrooms}
           updateSchedule={(updatedSchedule) => {
-            updateStudent({ ...selectedStudent, weeklySchedule: updatedSchedule });
+            updateStudent({
+              ...selectedStudent,
+              weeklySchedule: updatedSchedule,
+            });
             setSelectedStudent(null);
           }}
         />
