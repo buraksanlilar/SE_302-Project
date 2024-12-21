@@ -35,25 +35,36 @@ function Courses() {
     "21:20",
   ];
 
-  // Auto Assign Fonksiyonu
   const autoAssignCourses = () => {
     const updatedCourses = courses.map((course) => {
-      if (!course.classroom) {
+      if (!course.classroom || course.classroom === "Unknown Classroom") {
         const suitableClassroom = classrooms.find((classroom) => {
-          if (classroom.capacity < (course.students?.length || 0)) return false;
-          return true;
+          // Sınıf kapasitesini kontrol et
+          return (
+            classroom.capacity >= (course.students?.length || 0) &&
+            !courses.some(
+              (c) =>
+                c.classroom === classroom.name &&
+                c.day === course.day &&
+                c.hour === course.hour
+            )
+          );
         });
-
+  
         if (suitableClassroom) {
-          course.classroom = suitableClassroom.name;
+          return {
+            ...course,
+            classroom: suitableClassroom.name,
+          };
         }
       }
       return course;
     });
-
+  
     updateCourse(updatedCourses);
-    alert("Auto Assign completed successfully!");
   };
+  
+  
 
   const handleAddCourse = () => {
     if (

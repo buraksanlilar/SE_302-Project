@@ -25,9 +25,11 @@ function Students() {
     }
   };
 
-  const filteredStudents = students.filter((student) =>
-    student.name.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredStudents = search.trim()
+    ? students.filter((student) =>
+        student.name.toLowerCase().includes(search.toLowerCase().trim())
+      )
+    : students;
 
   return (
     <div className="container">
@@ -70,6 +72,19 @@ function Students() {
             </li>
           ))}
         </ul>
+   <ul>
+   {filteredStudents.map((student) => (
+     <li key={student.id}>
+       {student.name}
+       <div>
+         <button onClick={() => setSelectedStudent(student)}>Edit</button>
+         <button onClick={() => deleteStudent(student.id)}>Delete</button>
+       </div>
+     </li>
+   ))}
+ </ul>
+ 
+      
       )}
 
       {selectedStudent && (
