@@ -36,33 +36,117 @@ function Courses() {
   ];
 
   const autoAssignCourses = () => {
-    const updatedCourses = courses.map((course) => {
-      if (!course.classroom || course.classroom === "Unknown Classroom") {
-        const suitableClassroom = classrooms.find((classroom) => {
-          // Sınıf kapasitesini kontrol et
-          return (
-            classroom.capacity >= (course.students?.length || 0) &&
-            !courses.some(
-              (c) =>
-                c.classroom === classroom.name &&
-                c.day === course.day &&
-                c.hour === course.hour
-            )
-          );
-        });
+    const updatedCourses = [...courses]; // Kursların kopyasını al
   
-        if (suitableClassroom) {
-          return {
-            ...course,
-            classroom: suitableClassroom.name,
+    // Tüm sınıfların haftalık programlarını takip etmek için bir yapı oluştur
+    const classroomSchedules = classrooms.reduce((acc, classroom) => {
+      acc[classroom.name] = Array.from({ length: 16 }, () => Array(5).fill(null));
+      return acc;
+    }, {});
+  
+    const unassignedCourses = []; // Atanamayan kursları kaydetmek için
+  
+    updatedCourses.forEach((course) => {
+      if (!course.classroom || course.classroom === "Unknown Classroom") {
+        let assigned = false;
+  
+        for (const classroom of classrooms) {
+          const schedule = classroomSchedules[classroom.name];
+          const dayIndex = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"].indexOf(course.day);
+          const timeSlots = generateTimeSlots();
+          const normalizeTimeFormat = (time) => {
+            const [hour, minute] = time.split(":").map((t) => parseInt(t, 10));
+            return `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
           };
+          
+          // Normalizasyonu uygulayın:
+          const normalizedCourseHour = normalizeTimeFormat(course.hour.trim());
+          const startSlot = timeSlots.indexOf(normalizedCourseHour);
+          
+          const duration = parseInt(course.duration, 10);
+  
+          if (dayIndex === -1 || startSlot === -1 || duration <= 0) {
+            console.log(dayIndex)
+            console.log(startSlot)
+            console.log(duration)
+
+
+            
+            console.warn(`Invalid day or time for course: ${course.courseName}`);
+            break;
+          }
+  
+          // Çakışma kontrolü
+          const hasConflict = schedule
+            .slice(startSlot, startSlot + duration)
+            .some((row) => row[dayIndex] !== null);
+  
+          // Kapasite kontrolü
+          const isCapacitySufficient = classroom.capacity >= (course.students?.length || 0);
+  
+          if (!hasConflict && isCapacitySufficient) {
+            // Kursu sınıfa ata
+            for (let i = startSlot; i < startSlot + duration; i++) {
+              schedule[i][dayIndex] = course.courseName;
+            }
+            course.classroom = classroom.name;
+            assigned = true;
+            break;
+          }
+        }
+  
+        if (!assigned) {
+          unassignedCourses.push({
+            course: course.courseName,
+            reason: `No suitable classroom for ${course.courseName} on ${course.day} at ${course.hour}`,
+          });
         }
       }
-      return course;
     });
   
+    // Güncellenen kursları kaydet
     updateCourse(updatedCourses);
+  
+    // Atanamayan kursları raporla
+    if (unassignedCourses.length > 0) {
+      console.warn(
+        `Unassigned courses (${unassignedCourses.length}):`,
+        unassignedCourses
+      );
+      alert(
+        `Some courses could not be assigned:\n${unassignedCourses
+          .map((c) => `${c.course}: ${c.reason}`)
+          .join("\n")}`
+      );
+    } else {
+      alert("All courses have been successfully assigned!");
+    }
   };
+  
+  // Zaman dilimlerini oluşturma fonksiyonu
+  function generateTimeSlots() {
+    const slots = [];
+    let hour = 8;
+    let minute = 30;
+  
+    for (let i = 0; i < 16; i++) {
+      const start = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+      slots.push(start.trim());
+      minute += 45;
+      if (minute >= 60) {
+        hour += 1;
+        minute -= 60;
+      }
+      minute += 10;
+      if (minute >= 60) {
+        hour += 1;
+        minute -= 60;
+      }
+    }
+    return slots;
+  }
+  
+  
   
   
 
@@ -70,7 +154,6 @@ function Courses() {
     if (
       !newCourse ||
       !selectedTeacher ||
-      !selectedClassroom ||
       !selectedDay ||
       !selectedHour ||
       !duration
