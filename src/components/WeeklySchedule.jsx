@@ -3,7 +3,7 @@ import { CoursesContext } from "../context/CoursesContext";
 import "./WeeklySchedule.css";
 
 function WeeklySchedule({ student, updateSchedule }) {
-  const { courses } = useContext(CoursesContext);
+  const { courses, updateCourse } = useContext(CoursesContext);
   const [schedule, setSchedule] = useState(
     student.weeklySchedule ||
       Array.from({ length: 16 }, () => Array(5).fill(null))
@@ -11,6 +11,7 @@ function WeeklySchedule({ student, updateSchedule }) {
   const [selectedCourse, setSelectedCourse] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [notification, setNotification] = useState("");
+  const [deletedCourses, setDeletedCourses] = useState([]); // Silinen kursları takip et
 
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
   const timeSlots = generateTimeSlots();
@@ -39,6 +40,57 @@ function WeeklySchedule({ student, updateSchedule }) {
     }
     return slots;
   }
+
+  const handleDeleteCourse = (courseName) => {
+    const studentName = student.name.toLowerCase(); // Öğrenci adını küçük harfe çevir
+
+    // Haftalık programdan kursu kaldır
+    const updatedSchedule = schedule.map((row) =>
+      row.map((course) => (course === courseName ? null : course))
+    );
+
+    setSchedule(updatedSchedule);
+
+    // İlgili kursu bul ve öğrenciyi "" ile değiştir
+    const deletedCourse = courses.find(
+      (course) => course.courseName.toLowerCase() === courseName.toLowerCase()
+    );
+
+    if (deletedCourse) {
+      const updatedStudents = deletedCourse.students.map((s) =>
+        s.toLowerCase() === studentName ? "" : s
+      );
+
+      const updatedCourse = {
+        ...deletedCourse,
+        students: updatedStudents,
+      };
+
+      // Güncellenmiş kursu bağlamda kaydetmek için kullan
+      const updatedCourses = courses.map((course) =>
+        course.id === updatedCourse.id ? updatedCourse : course
+      );
+
+      updateCourse(updatedCourses);
+
+      setNotification(
+        `"${student.name}" has been removed from "${courseName}".`
+      );
+    }
+  };
+
+  const saveSchedule = () => {
+    console.log("Final Schedule Before Saving:", schedule);
+
+    // Haftalık programı bağlama kaydet
+    updateSchedule(schedule);
+
+    // Yerel depolamayı kontrol et
+    const savedCourses = JSON.parse(localStorage.getItem("courses"));
+    console.log("LocalStorage Courses After Update:", savedCourses);
+
+    alert("Schedule saved successfully!");
+  };
 
   const placeCourseAutomatically = () => {
     if (!selectedCourse) {
@@ -87,20 +139,6 @@ function WeeklySchedule({ student, updateSchedule }) {
     setSchedule(updatedSchedule);
     setErrorMessage("");
     setNotification(`"${course.courseName}" has been placed successfully.`);
-  };
-
-  const handleDeleteCourse = (courseName) => {
-    const updatedSchedule = schedule.map((row) =>
-      row.map((course) => (course === courseName ? null : course))
-    );
-
-    setSchedule(updatedSchedule);
-    setNotification(`All instances of "${courseName}" have been removed.`);
-  };
-
-  const saveSchedule = () => {
-    updateSchedule(schedule);
-    alert("Schedule saved successfully!");
   };
 
   return (

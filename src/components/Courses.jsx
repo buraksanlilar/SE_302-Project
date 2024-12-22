@@ -7,7 +7,7 @@ import "./components.css";
 function Courses() {
   const { courses, addCourse, deleteCourse, updateCourse } =
     useContext(CoursesContext);
-  const { teachers, addTeacher } = useContext(TeachersContext);
+  const { teachers } = useContext(TeachersContext);
   const { classrooms } = useContext(ClassroomContext);
 
   const [newCourse, setNewCourse] = useState("");
@@ -16,6 +16,7 @@ function Courses() {
   const [selectedDay, setSelectedDay] = useState("");
   const [selectedHour, setSelectedHour] = useState("");
   const [duration, setDuration] = useState("");
+  const [students, setStudents] = useState("");
 
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
   const hours = [
@@ -37,7 +38,7 @@ function Courses() {
 
   const autoAssignCourses = () => {
     const updatedCourses = [...courses]; // Kursların kopyasını al
-  
+
     // Tüm sınıfların haftalık programlarını takip etmek için bir yapı oluştur
     const classroomSchedules = {};
 
@@ -50,49 +51,59 @@ function Courses() {
       }
       classroomSchedules[classroom.name] = schedule; // Sınıfın adına göre tabloyu sakla
     });
-    
+
     console.log("Classroom Schedules Initialized:", classroomSchedules);
-    
+
     const unassignedCourses = []; // Atanamayan kursları kaydetmek için
-  
+
     updatedCourses.forEach((course) => {
       if (!course.classroom || course.classroom === "Unknown Classroom") {
         let assigned = false;
-  
+
         for (const classroom of classrooms) {
           const schedule = classroomSchedules[classroom.name];
-          const dayIndex = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"].indexOf(course.day);
+          const dayIndex = [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+          ].indexOf(course.day);
           const timeSlots = generateTimeSlots();
           const normalizeTimeFormat = (time) => {
             const [hour, minute] = time.split(":").map((t) => parseInt(t, 10));
-            return `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+            return `${String(hour).padStart(2, "0")}:${String(minute).padStart(
+              2,
+              "0"
+            )}`;
           };
-          
+
           // Normalizasyonu uygulayın:
           const normalizedCourseHour = normalizeTimeFormat(course.hour.trim());
           const startSlot = timeSlots.indexOf(normalizedCourseHour);
-          
+
           const duration = parseInt(course.duration, 10);
-  
+
           if (dayIndex === -1 || startSlot === -1 || duration <= 0) {
-            console.log(dayIndex)
-            console.log(startSlot)
-            console.log(duration)
+            console.log(dayIndex);
+            console.log(startSlot);
+            console.log(duration);
 
-
-            
-            console.warn(`Invalid day or time for course: ${course.courseName}`);
+            console.warn(
+              `Invalid day or time for course: ${course.courseName}`
+            );
             break;
           }
-  
+
           // Çakışma kontrolü
           const hasConflict = schedule
             .slice(startSlot, startSlot + duration)
             .some((row) => row[dayIndex] !== null);
-  
+
           // Kapasite kontrolü
-          const isCapacitySufficient = classroom.capacity >= (course.students?.length || 0);
-  
+          const isCapacitySufficient =
+            classroom.capacity >= (course.students?.length || 0);
+
           if (!hasConflict && isCapacitySufficient) {
             // Kursu sınıfa ata
             for (let i = startSlot; i < startSlot + duration; i++) {
@@ -103,7 +114,7 @@ function Courses() {
             break;
           }
         }
-  
+
         if (!assigned) {
           unassignedCourses.push({
             course: course.courseName,
@@ -112,11 +123,10 @@ function Courses() {
         }
       }
     });
-    
-  
+
     // Güncellenen kursları kaydet
     updateCourse(updatedCourses);
-  
+
     // Atanamayan kursları raporla
     if (unassignedCourses.length > 0) {
       console.warn(
@@ -132,15 +142,17 @@ function Courses() {
       alert("All courses have been successfully assigned!");
     }
   };
-  
-  // Zaman dilimlerini oluşturma fonksiyonu
+
   function generateTimeSlots() {
     const slots = [];
     let hour = 8;
     let minute = 30;
-  
+
     for (let i = 0; i < 16; i++) {
-      const start = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+      const start = `${String(hour).padStart(2, "0")}:${String(minute).padStart(
+        2,
+        "0"
+      )}`;
       slots.push(start.trim());
       minute += 45;
       if (minute >= 60) {
@@ -155,10 +167,6 @@ function Courses() {
     }
     return slots;
   }
-  
-  
-  
-  
 
   const handleAddCourse = () => {
     if (
@@ -180,6 +188,9 @@ function Courses() {
       day: selectedDay,
       hour: selectedHour,
       duration: duration,
+      students: students
+        ? students.split(",").map((student) => student.trim())
+        : [],
     };
 
     addCourse(newCourseData);
@@ -189,13 +200,13 @@ function Courses() {
     setSelectedDay("");
     setSelectedHour("");
     setDuration("");
+    setStudents("");
   };
 
   return (
     <div className="container">
       <h3>Manage Courses</h3>
 
-      {/* Form */}
       <input
         type="text"
         placeholder="Course Name"
@@ -203,59 +214,54 @@ function Courses() {
         onChange={(e) => setNewCourse(e.target.value)}
       />
 
-      {/* Select Classroom */}
       <select
         value={selectedClassroom}
         onChange={(e) => setSelectedClassroom(e.target.value)}
       >
         <option value="">Select Classroom</option>
-        {classrooms.map((classroom) => (
-          <option key={classroom.id} value={classroom.name}>
+        {classrooms.map((classroom, index) => (
+          <option key={`${classroom.id}-${index}`} value={classroom.name}>
             {classroom.name}
           </option>
         ))}
       </select>
 
-      {/* Select Teacher */}
       <select
         value={selectedTeacher}
         onChange={(e) => setSelectedTeacher(e.target.value)}
       >
         <option value="">Select Teacher</option>
-        {teachers.map((teacher) => (
-          <option key={teacher.id} value={teacher.name}>
+        {teachers.map((teacher, index) => (
+          <option key={`${teacher.id}-${index}`} value={teacher.name}>
             {teacher.name}
           </option>
         ))}
       </select>
 
-      {/* Select Day */}
       <select
         value={selectedDay}
         onChange={(e) => setSelectedDay(e.target.value)}
       >
         <option value="">Select Day</option>
-        {days.map((day) => (
-          <option key={day} value={day}>
+        {days.map((day, index) => (
+          <option key={`${day}-${index}`} value={day}>
             {day}
           </option>
         ))}
       </select>
 
-      {/* Select Hour */}
       <select
         value={selectedHour}
         onChange={(e) => setSelectedHour(e.target.value)}
       >
         <option value="">Select Hour</option>
-        {hours.map((hour) => (
-          <option key={hour} value={hour}>
+        {hours.map((hour, index) => (
+          <option key={`${hour}-${index}`} value={hour}>
             {hour}
           </option>
         ))}
       </select>
 
-      {/* Duration */}
       <input
         type="number"
         placeholder="Duration (hours)"
@@ -264,7 +270,6 @@ function Courses() {
         onChange={(e) => setDuration(e.target.value)}
       />
 
-      {/* Button Group */}
       <div className="button-group">
         <button onClick={handleAddCourse}>Add Course</button>
         <button className="auto-assign-button" onClick={autoAssignCourses}>
@@ -272,13 +277,12 @@ function Courses() {
         </button>
       </div>
 
-      {/* Kurs Listesi */}
       <ul>
-  {courses.map((course) => (
-    <li key={course.id}>
-        {course.courseName} | {course.teacherName} | {course.day} |{" "}
-        {course.hour} | Classroom: {course.classroom || "Not Assigned"} |
-        Duration: {course.duration} hours
+        {courses.map((course, index) => (
+          <li key={`${course.id}-${index}`}>
+            {course.courseName} | {course.teacherName} | {course.day} |{" "}
+            {course.hour} | Classroom: {course.classroom || "Not Assigned"} |
+            Duration: {course.duration} hours
             <button
               className="delete-button"
               onClick={() => deleteCourse(course.id)}
@@ -288,7 +292,6 @@ function Courses() {
           </li>
         ))}
       </ul>
-
     </div>
   );
 }
