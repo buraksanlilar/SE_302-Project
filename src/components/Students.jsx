@@ -1,7 +1,7 @@
 import React, { useState, useContext } from "react";
 import { StudentsContext } from "../context/StudentsContext";
 import { ClassroomContext } from "../context/ClassroomContext";
-import WeeklySchedule from "./weeklySchedule";
+import WeeklySchedule from "./WeeklySchedule";
 import "./StudentManagement.css";
 
 function Students() {
@@ -40,51 +40,34 @@ function Students() {
           <div className="form-group">
             <input
               type="text"
-              placeholder="Enter student name"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search students..."
+            />
+            <input
+              type="text"
               value={newStudent}
               onChange={(e) => setNewStudent(e.target.value)}
+              placeholder="Add new student..."
             />
             <button onClick={handleAddStudent}>Add Student</button>
           </div>
-
-          <input
-            type="text"
-            placeholder="Search student"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+          <ul>
+            {filteredStudents.map((student) => (
+              <li key={student.id}>
+                {student.name}
+                <div>
+                  <button onClick={() => setSelectedStudent(student)}>
+                    Edit
+                  </button>
+                  <button onClick={() => deleteStudent(student.id)}>
+                    Delete
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
         </>
-      )}
-
-      {!selectedStudent && (
-        <ul>
-          {filteredStudents.map((student) => (
-            <li key={student.id}>
-              {student.name}
-              <div>
-                <button onClick={() => setSelectedStudent(student)}>
-                  Edit
-                </button>
-                <button onClick={() => deleteStudent(student.id)}>
-                  Delete
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
-   <ul>
-   {filteredStudents.map((student) => (
-     <li key={student.id}>
-       {student.name}
-       <div>
-         <button onClick={() => setSelectedStudent(student)}>Edit</button>
-         <button onClick={() => deleteStudent(student.id)}>Delete</button>
-       </div>
-     </li>
-   ))}
- </ul>
- 
-      
       )}
 
       {selectedStudent && (
@@ -92,10 +75,11 @@ function Students() {
           student={selectedStudent}
           classrooms={classrooms}
           updateSchedule={(updatedSchedule) => {
-            updateStudent({
+            const updatedStudent = {
               ...selectedStudent,
               weeklySchedule: updatedSchedule,
-            });
+            };
+            updateStudent(updatedStudent);
             setSelectedStudent(null);
           }}
         />

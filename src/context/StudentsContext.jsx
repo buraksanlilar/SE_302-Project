@@ -10,135 +10,67 @@ const StudentsContextProvider = ({ children }) => {
     return savedStudents || [];
   });
 
-  const [error, setError] = useState(null);
-  useEffect(() => {
-    if (
-      students.length > 0 &&
-      JSON.parse(localStorage.getItem("courses"))?.length > 0
-    ) {
-      addCoursesToStudents();
-    }
-  }, [students]); // students değişince tetiklenir
+  const [error, setError] = useState([]);
 
+  // Öğrencileri localStorage'a kaydet
   useEffect(() => {
     console.log("Saving Students to localStorage:", students);
     localStorage.setItem("students", JSON.stringify(students));
   }, [students]);
 
-  const addCoursesToStudents = () => {
-    const courses = JSON.parse(localStorage.getItem("courses")) || [];
-    console.log("Courses Loaded:", courses);
+  const [coursesProcessed, setCoursesProcessed] = useState(false); // Kursların işlendiğini takip eden durum
 
-    if (!courses.length) {
-      console.warn("No courses found in localStorage.");
-      return;
+  useEffect(() => {
+    // Eğer kurslar işlenmediyse ve öğrenciler yüklendiyse çalıştır
+    if (!coursesProcessed && students.length > 0) {
+      addCoursesToStudents();
+      setCoursesProcessed(true); // Kursların işlendiğini işaretle
     }
-
-    if (!students.length) {
-      console.warn("Students array is empty before adding courses.");
-      return;
-    }
-
-    const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
-    const courseMap = new Map();
-
-    // Kursları map yapısına dönüştür
-    courses.forEach((course) => {
-      course.students.forEach((student) => {
-        const studentName = student.trim().toLowerCase();
-        if (!courseMap.has(studentName)) {
-          courseMap.set(studentName, []);
-        }
-        courseMap.get(studentName).push(course);
-      });
-    });
-
-    console.log("Course Map:", courseMap);
-
-    // Öğrencileri güncelle
-    const updatedStudents = students.map((student) => {
-      const studentName = student.name.trim().toLowerCase();
-      const relevantCourses = courseMap.get(studentName) || [];
-      console.log(`Relevant Courses for ${student.name}:`, relevantCourses);
-
-      if (!relevantCourses.length) return student;
-
-      const updatedSchedule = student.weeklySchedule.map((row) => [...row]);
-
-      relevantCourses.forEach((course) => {
-        const dayIndex = days.indexOf(course.day);
-        if (dayIndex === -1) {
-          console.warn(`Invalid day for course: ${course.courseName}`);
-          return;
-        }
-
-        const timeSlots = generateTimeSlots();
-        const startSlot = timeSlots.indexOf(course.hour.trim());
-        if (startSlot === -1) {
-          console.warn(`Invalid hour for course: ${course.courseName}`);
-          return;
-        }
-
-        const duration = parseInt(course.duration, 10);
-        const endSlot = startSlot + duration;
-
-        const hasConflict = updatedSchedule
-          .slice(startSlot, endSlot)
-          .some((slot) => slot[dayIndex] !== null);
-
-        if (!hasConflict) {
-          for (let i = startSlot; i < endSlot; i++) {
-            updatedSchedule[i][dayIndex] = course.courseName;
-          }
-        } else {
-          console.warn(
-            `Conflict detected for ${student.name} in course ${course.courseName}`
-          );
-        }
-      });
-
-      return { ...student, weeklySchedule: updatedSchedule };
-    });
-
-    console.log("Updated Students After Adding Courses:", updatedStudents);
+  }, [students, coursesProcessed]); // coursesProcessed kontrolü ile tekrar çalışmasını engelle
 
   // Yeni öğrenci ekleme fonksiyonu
- 
-
- 
-
   const addStudent = (newStudent) => {
     setStudents((prevStudents) => {
-      const existingNames = new Set(prevStudents.map((s) => s.name.toLowerCase()));
-  
+      const existingNames = new Set(
+        prevStudents.map((s) => s.name.toLowerCase())
+      );
+
       if (!existingNames.has(newStudent.name.toLowerCase())) {
         const updatedStudents = [
           ...prevStudents,
           {
             id: uuidv4(), // Benzersiz UUID
             name: newStudent.name.trim(),
-            weeklySchedule: Array.from({ length: 16 }, () => Array(5).fill(null)),
+            weeklySchedule: Array.from({ length: 16 }, () =>
+              Array(5).fill(null)
+            ),
           },
         ];
-  
-        localStorage.setItem("students", JSON.stringify(updatedStudents));
+
         return updatedStudents;
       }
-  
+
       return prevStudents;
     });
   };
-  
-  
+
+  // Öğrenci güncelleme fonksiyonu
+  const updateStudent = (updatedStudent) => {
+    setStudents((prevStudents) =>
+      prevStudents.map((student) =>
+        student.id === updatedStudent.id ? updatedStudent : student
+      )
+    );
+  };
 
   // Öğrenci silme fonksiyonu
   const deleteStudent = (id) => {
-    const updatedStudents = students.filter((student) => student.id !== id);
-    setStudents(updatedStudents);
-    localStorage.setItem("students", JSON.stringify(updatedStudents));
+    setStudents((prevStudents) =>
+      prevStudents.filter((student) => student.id !== id)
+    );
   };
 
-  const generateTimeSlots = () => {
+  function generateTimeSlots() {
     const slots = [];
     let hour = 8;
     let minute = 30;
@@ -148,7 +80,7 @@ const StudentsContextProvider = ({ children }) => {
         2,
         "0"
       )}`;
-      slots.push(start);
+      slots.push(start.trim());
       minute += 45;
       if (minute >= 60) {
         hour += 1;
@@ -161,8 +93,142 @@ const StudentsContextProvider = ({ children }) => {
       }
     }
     return slots;
+  }
+
+  const addCoursesToStudents = () => {
+    const courses = JSON.parse(localStorage.getItem("courses")) || [];
+    console.log("Courses Loaded:", courses);
+
+    if (!courses.length) {
+      console.warn("No courses found in localStorage.");
+      return;
+    }
+
+    // Zaman dilimlerini oluştur ve normalize et
+    const generateTimeSlots = () => {
+      const slots = [];
+      let hour = 8;
+      let minute = 30;
+
+      for (let i = 0; i < 16; i++) {
+        const start = `${String(hour).padStart(2, "0")}:${String(
+          minute
+        ).padStart(2, "0")}`;
+        slots.push(start.trim());
+        minute += 45;
+        if (minute >= 60) {
+          hour += 1;
+          minute -= 60;
+        }
+        minute += 10;
+        if (minute >= 60) {
+          hour += 1;
+          minute -= 60;
+        }
+      }
+      return slots;
+    };
+
+    const normalizeTimeFormat = (time) => {
+      const [hour, minute] = time.split(":").map((t) => parseInt(t, 10));
+      return `${String(hour).padStart(2, "0")}:${String(minute).padStart(
+        2,
+        "0"
+      )}`;
+    };
+
+    const timeSlots = generateTimeSlots().map(normalizeTimeFormat);
+
+    const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+    const courseMap = new Map();
+    const conflictList = []; // Çakışmaları toplamak için liste
+    const successList = []; // Başarıyla eklenen dersleri tutmak için liste
+
+    // Öğrenci adlarına göre kursları eşleştir
+    courses.forEach((course) => {
+      course.students.forEach((student) => {
+        const studentName = student.trim().toLowerCase();
+        if (!courseMap.has(studentName)) {
+          courseMap.set(studentName, []);
+        }
+        courseMap.get(studentName).push(course);
+      });
+    });
+
+    const updatedStudents = students.map((student) => {
+      const studentName = student.name.trim().toLowerCase();
+      const relevantCourses = courseMap.get(studentName) || [];
+      if (!relevantCourses.length) return student;
+
+      const updatedSchedule = student.weeklySchedule.map((row) => [...row]);
+
+      relevantCourses.forEach((course) => {
+        const dayIndex = days.indexOf(course.day);
+        if (dayIndex === -1) {
+          console.warn(`Invalid day for course: ${course.courseName}`);
+          return;
+        }
+
+        const normalizedCourseHour = normalizeTimeFormat(course.hour.trim());
+        const startSlot = timeSlots.indexOf(normalizedCourseHour);
+        if (startSlot === -1) {
+          console.warn(
+            `Invalid hour for course: ${course.courseName}, hour: ${course.hour}`
+          );
+          return;
+        }
+
+        const duration = parseInt(course.duration, 10);
+        const endSlot = startSlot + duration;
+
+        // Kursun zaten programa eklenmiş olup olmadığını kontrol et
+        const isAlreadyAdded = updatedSchedule.some((row) =>
+          row.some((slot) => slot === course.courseName)
+        );
+        if (isAlreadyAdded) {
+          console.log(`Skipping already added course: ${course.courseName}`);
+          return;
+        }
+
+        const hasConflict = updatedSchedule
+          .slice(startSlot, endSlot)
+          .some((slot) => slot[dayIndex] !== null);
+
+        if (hasConflict) {
+          conflictList.push(
+            `Conflict: ${student.name} - ${course.courseName} on ${course.day} at ${course.hour}`
+          );
+        } else {
+          for (let i = startSlot; i < endSlot; i++) {
+            updatedSchedule[i][dayIndex] = course.courseName;
+          }
+          successList.push(
+            `Added: ${student.name} - ${course.courseName} on ${course.day} at ${course.hour}`
+          );
+        }
+      });
+
+      return { ...student, weeklySchedule: updatedSchedule };
+    });
+
+    if (conflictList.length > 0) {
+      console.warn(
+        `Conflicts detected (${conflictList.length}):\n`,
+        conflictList.join("\n")
+      );
+    }
+
+    if (successList.length > 0) {
+      console.log(
+        `Successfully added (${successList.length}):\n`,
+        successList.join("\n")
+      );
+    }
+
+    setStudents(updatedStudents);
   };
 
+  // CSV'den gelen veriyi işleme
   useEffect(() => {
     const handleCsvData = (event, data) => {
       console.log("Received data:", data);
@@ -178,23 +244,21 @@ const StudentsContextProvider = ({ children }) => {
             )
           );
 
-          console.log("Unique Students from CSV:", uniqueCsvStudents);
-    
           setStudents((prevStudents) => {
             const existingNames = new Set(
               prevStudents.map((s) => s.name.toLowerCase())
             );
-    
+
             const newStudents = uniqueCsvStudents
               .filter((name) => !existingNames.has(name))
               .map((name) => ({
-                id: uuidv4(), // Benzersiz UUID
+                id: uuidv4(),
                 name: name.charAt(0).toUpperCase() + name.slice(1),
                 weeklySchedule: Array.from({ length: 16 }, () =>
                   Array(5).fill(null)
                 ),
               }));
-    
+
             const updatedStudents = [...prevStudents, ...newStudents];
             console.log(
               "Updated Students After CSV Processing:",
@@ -205,10 +269,12 @@ const StudentsContextProvider = ({ children }) => {
         }
       } catch (err) {
         console.error("Error processing CSV data:", err);
-        setError("Öğrenci verileri yüklenirken hata oluştu.");
+        setError((prevError) => [
+          ...prevError,
+          "Error processing student data from CSV.",
+        ]);
       }
     };
-    
 
     window.electronAPI?.on("courses-data", handleCsvData);
 
@@ -221,12 +287,19 @@ const StudentsContextProvider = ({ children }) => {
     <StudentsContext.Provider
       value={{
         students,
+        addStudent,
+        updateStudent,
+        deleteStudent,
         addCoursesToStudents,
       }}
     >
       {children}
-      {error && (
-        <div style={{ color: "red", textAlign: "center" }}>{error}</div>
+      {error.length > 0 && (
+        <div style={{ color: "red", textAlign: "center" }}>
+          {error.map((err, index) => (
+            <p key={index}>{err}</p>
+          ))}
+        </div>
       )}
     </StudentsContext.Provider>
   );
