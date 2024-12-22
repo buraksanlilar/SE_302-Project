@@ -49,68 +49,86 @@ function Sidebar({ activeTab, setActiveTab }) {
           <div className="modal-content">
             <h2>About Campus Dashboard</h2>
             <p>
-              <strong>Campus Dashboard</strong> is a desktop application
-              designed to assist educational institutions in efficiently
-              managing course schedules, classrooms, and student enrollments.
-              The software provides a modern, user-friendly interface that
-              simplifies scheduling operations and ensures conflict-free course
-              assignments.
+              <strong>Welcome to Campus Dashboard!</strong> This application
+              helps educational institutions efficiently manage their resources,
+              including students, teachers, classrooms, and courses.
             </p>
+            <h3>Quick Start Guide</h3>
+            <ul>
+              <li>
+                <strong>Dashboard:</strong> Get an overview of total counts for
+                students, teachers, classrooms, and courses. Click on any card
+                to explore details.
+              </li>
+              <li>
+                <strong>Students:</strong> Add, delete, and manage students.
+                View and edit their weekly schedules.
+              </li>
+              <li>
+                <strong>Teachers:</strong> Maintain your teaching staff list
+                and manage course assignments.
+              </li>
+              <li>
+                <strong>Classrooms:</strong> Check classroom availability, add
+                new classrooms, and view weekly schedules.
+              </li>
+              <li>
+                <strong>Courses:</strong> Organize course details, assign
+                teachers and classrooms, and handle scheduling conflicts.
+              </li>
+            </ul>
             <h3>Key Features</h3>
             <ul>
               <li>
-                <strong>Course Management:</strong> Add, delete, and reassign
-                courses.
+                <strong>Automated Scheduling:</strong> Assign courses to
+                classrooms based on capacity and availability.
               </li>
               <li>
-                <strong>Classroom Scheduling:</strong> Assign classrooms based
-                on capacity and availability.
+                <strong>Conflict Detection:</strong> Prevent scheduling issues
+                with real-time conflict alerts.
               </li>
               <li>
-                <strong>Conflict Detection:</strong> Detect and resolve
-                scheduling conflicts.
-              </li>
-              <li>
-                <strong>Attendance Tracking:</strong> View and manage attendance
-                lists for each course.
-              </li>
-              <li>
-                <strong>Weekly Schedules:</strong> View and edit student and
-                classroom schedules.
-              </li>
-              <li>
-                <strong>Data Persistence:</strong> Save and load schedules and
-                course data.
-              </li>
-              <li>
-                <strong>File Import/Export:</strong> Seamlessly manage data
-                using CSV files.
-              </li>
-            </ul>
-            <h3>System Requirements</h3>
-            <ul>
-              <li>
-                <strong>Operating System:</strong> Windows
-              </li>
-              <li>
-                <strong>Language:</strong> English
-              </li>
-              <li>
-                <strong>Technologies:</strong> React, Electron, JavaScript
+                <strong>Data Management:</strong> Import/export data using CSV
+                files for seamless updates.
               </li>
             </ul>
             <h3>Version Information</h3>
             <p>
-              <strong>Version:</strong> 1.0.0
-              <br />
+              <strong>Version:</strong> 1.0.1<br />
               <strong>Release Date:</strong> December 2024
-              <br />
-              <strong>Developed By:</strong>
             </p>
+            <h3>Developed By</h3>
             <ul>
-              <li>Selen ÖZNUR - 20220602062</li>
-              <li>Özcan Burak ŞANLILAR - 20210602058</li>
-              <li>Kadir AY - 20210602006</li>
+              <li>
+                <a
+                  href="https://github.com/selenoznur"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ textDecoration: "none", color: "#3498db" }}
+                >
+                  Selen ÖZNUR - 20220602062
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://github.com/buraksanlilar"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ textDecoration: "none", color: "#3498db" }}
+                >
+                  Özcan Burak ŞANLILAR - 20210602058
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://github.com/sucreistaken"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ textDecoration: "none", color: "#3498db" }}
+                >
+                  Kadir AY - 20210602006
+                </a>
+              </li>
               <li>Orkun Efe ÖZDEMİR - 20220602061</li>
             </ul>
             <p style={{ textAlign: "center", marginTop: "20px" }}>

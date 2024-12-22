@@ -10,7 +10,7 @@ function Dashboard({ setActiveTab }) {
   const { classrooms } = useContext(ClassroomContext);
   const { teachers } = useContext(TeachersContext);
   const { courses } = useContext(CoursesContext);
-  const { students } = useContext(StudentsContext); // StudentsContext kullanımı eklendi
+  const { students } = useContext(StudentsContext);
 
   const [selectedCard, setSelectedCard] = useState(null);
   const [selectedCourse, setSelectedCourse] = useState(null);
@@ -21,28 +21,36 @@ function Dashboard({ setActiveTab }) {
 
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
   const hours = [
-    "08:30", "09:25", "10:20", "11:15", "13:00", "13:55",
-    "14:50", "15:45", "16:40", "17:40", "18:35", "19:30", "20:25", "21:20"
+    "08:30",
+    "09:25",
+    "10:20",
+    "11:15",
+    "13:00",
+    "13:55",
+    "14:50",
+    "15:45",
+    "16:40",
+    "17:40",
+    "18:35",
+    "19:30",
+    "20:25",
+    "21:20",
   ];
 
-  // Kursları filtrele
   const filteredCourses = courses.filter((course) =>
     course.courseName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Sınıfları filtrele
   const filteredClassrooms = classrooms.filter((classroom) =>
     classroom.name.toLowerCase().includes(classroomSearchQuery.toLowerCase())
   );
 
-  // Kursa kayıtlı öğrencileri filtrele
   const courseStudents = students.filter((student) =>
     student.weeklySchedule.some((row) =>
       row.some((entry) => entry && entry.includes(selectedCourse?.courseName))
     )
   );
 
-  // Sınıfın haftalık programını oluştur
   const getClassroomSchedule = (classroomName) => {
     const schedule = Array.from({ length: hours.length }, () =>
       Array(days.length).fill("-")
@@ -73,7 +81,7 @@ function Dashboard({ setActiveTab }) {
         return (
           <ul>
             {students.map((student) => (
-              <li key={student.id}>{student.name}</li>
+              <li key={`${student.id}-${student.name}`}>{student.name}</li>
             ))}
           </ul>
         );
@@ -81,7 +89,7 @@ function Dashboard({ setActiveTab }) {
         return (
           <ul>
             {teachers.map((teacher) => (
-              <li key={teacher.id}>{teacher.name}</li>
+              <li key={`${teacher.id}-${teacher.name}`}>{teacher.name}</li>
             ))}
           </ul>
         );
@@ -89,7 +97,7 @@ function Dashboard({ setActiveTab }) {
         return (
           <ul>
             {classrooms.map((classroom) => (
-              <li key={classroom.id}>
+              <li key={`${classroom.id}-${classroom.name}`}>
                 {classroom.name} - Capacity: {classroom.capacity}
               </li>
             ))}
@@ -99,7 +107,7 @@ function Dashboard({ setActiveTab }) {
         return (
           <ul>
             {courses.map((course) => (
-              <li key={course.id}>
+              <li key={`${course.id}-${course.courseName}`}>
                 {course.courseName} (Teacher: {course.teacherName})
               </li>
             ))}
@@ -113,8 +121,6 @@ function Dashboard({ setActiveTab }) {
   return (
     <div className="dashboard-container">
       <h2 className="dashboard-title">Dashboard Overview</h2>
-
-      {/* Kartlar */}
       <div className="cards-container">
         <div className="card" onClick={() => setSelectedCard("students")}>
           <h3>Total Students</h3>
@@ -133,8 +139,6 @@ function Dashboard({ setActiveTab }) {
           <p>{courses.length}</p>
         </div>
       </div>
-
-      {/* Attendance Section */}
       <div className="attendance-section">
         <h3>Student Attendance by Course</h3>
         {!selectedCourse ? (
@@ -148,7 +152,7 @@ function Dashboard({ setActiveTab }) {
             <div className="scrollable-list">
               <ul className="course-list">
                 {filteredCourses.map((course) => (
-                  <li key={course.id}>
+                  <li key={`${course.id}-${course.courseName}`}>
                     {course.courseName} - {course.teacherName}
                     <button onClick={() => setSelectedCourse(course)}>
                       View Students
@@ -166,7 +170,7 @@ function Dashboard({ setActiveTab }) {
             </h4>
             <ul>
               {courseStudents.map((student) => (
-                <li key={student.id}>
+                <li key={`${student.id}-${student.name}`}>
                   {student.name}
                   <button onClick={() => setSelectedStudent(student)}>
                     View Schedule
@@ -174,7 +178,10 @@ function Dashboard({ setActiveTab }) {
                 </li>
               ))}
             </ul>
-            <button className="back-button" onClick={() => setSelectedCourse(null)}>
+            <button
+              className="back-button"
+              onClick={() => setSelectedCourse(null)}
+            >
               Back
             </button>
           </div>
@@ -191,7 +198,7 @@ function Dashboard({ setActiveTab }) {
         <div className="scrollable-list">
           <ul className="classroom-list">
             {filteredClassrooms.map((classroom) => (
-              <li key={classroom.id}>
+              <li key={`${classroom.id}-${classroom.name}`}>
                 {classroom.name} - Capacity: {classroom.capacity}
                 <button onClick={() => setSelectedClassroom(classroom)}>
                   View Schedule
@@ -201,7 +208,6 @@ function Dashboard({ setActiveTab }) {
           </ul>
         </div>
       </div>
-      {/* Weekly Schedule Modal for Classrooms */}
       {selectedClassroom && (
         <div className="modal-overlay">
           <div className="modal-content">
@@ -218,10 +224,12 @@ function Dashboard({ setActiveTab }) {
               <tbody>
                 {getClassroomSchedule(selectedClassroom.name).map(
                   (row, rowIndex) => (
-                    <tr key={rowIndex}>
+                    <tr key={`row-${rowIndex}`}>
                       <td>{hours[rowIndex]}</td>
                       {row.map((cell, cellIndex) => (
-                        <td key={cellIndex}>{cell || "-"}</td>
+                        <td key={`cell-${rowIndex}-${cellIndex}`}>
+                          {cell || "-"}
+                        </td>
                       ))}
                     </tr>
                   )
@@ -230,11 +238,9 @@ function Dashboard({ setActiveTab }) {
             </table>
             <button onClick={() => setSelectedClassroom(null)}>Close</button>
           </div>
-          
         </div>
       )}
-       {/* Modal for Cards */}
-       {selectedCard && (
+      {selectedCard && (
         <div className="modal-overlay">
           <div className="modal-content">
             <h3>
@@ -251,7 +257,6 @@ function Dashboard({ setActiveTab }) {
         </div>
       )}
     </div>
-      
   );
 }
 

@@ -35,7 +35,6 @@ function Students() {
     const studentNameNormalized = normalizeString(student.name);
     const searchNormalized = normalizeString(search);
     const isMatch = studentNameNormalized.includes(searchNormalized);
-    console.log(`Filtering student: ${student.name}, Match: ${isMatch}`);
     return isMatch;
   });
   
@@ -50,36 +49,34 @@ function Students() {
           <div className="form-group">
             <input
               type="text"
-              placeholder="Enter student name"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search students..."
+            />
+            <input
+              type="text"
               value={newStudent}
               onChange={(e) => setNewStudent(e.target.value)}
+              placeholder="Add new student..."
             />
             <button onClick={handleAddStudent}>Add Student</button>
           </div>
-
-          <input
-            type="text"
-            placeholder="Search student"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+          <ul>
+            {filteredStudents.map((student) => (
+              <li key={student.id}>
+                {student.name}
+                <div>
+                  <button onClick={() => setSelectedStudent(student)}>
+                    Edit
+                  </button>
+                  <button onClick={() => deleteStudent(student.id)}>
+                    Delete
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
         </>
-      )}
-
-      {!selectedStudent && (
-   <ul>
-   {filteredStudents.map((student) => (
-     <li key={student.id}>
-       {student.name}
-       <div>
-         <button onClick={() => setSelectedStudent(student)}>Edit</button>
-         <button onClick={() => deleteStudent(student.id)}>Delete</button>
-       </div>
-     </li>
-   ))}
- </ul>
- 
-      
       )}
 
       {selectedStudent && (
@@ -87,7 +84,11 @@ function Students() {
           student={selectedStudent}
           classrooms={classrooms}
           updateSchedule={(updatedSchedule) => {
-            updateStudent({ ...selectedStudent, weeklySchedule: updatedSchedule });
+            const updatedStudent = {
+              ...selectedStudent,
+              weeklySchedule: updatedSchedule,
+            };
+            updateStudent(updatedStudent);
             setSelectedStudent(null);
           }}
         />
