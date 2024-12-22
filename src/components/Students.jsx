@@ -24,21 +24,12 @@ function Students() {
       setNewStudent("");
     }
   };
-  const normalizeString = (str) => {
-    return str
-      .toLocaleLowerCase("tr-TR") // Türkçe dil kurallarına göre küçültme
-      .normalize("NFKD") // Unicode normalization
-      .replace(/[\u0300-\u036f]/g, ""); // Diakritik işaretlerini kaldırır
-  };
-  
-  const filteredStudents = students.filter((student) => {
-    const studentNameNormalized = normalizeString(student.name);
-    const searchNormalized = normalizeString(search);
-    const isMatch = studentNameNormalized.includes(searchNormalized);
-    return isMatch;
-  });
-  
-  
+
+  const filteredStudents = search.trim()
+    ? students.filter((student) =>
+        student.name.toLowerCase().includes(search.toLowerCase().trim())
+      )
+    : students;
 
   return (
     <div className="container">
