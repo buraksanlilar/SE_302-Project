@@ -9,6 +9,7 @@ const CoursesProvider = ({ children }) => {
   });
 
   useEffect(() => {
+    // Electron'dan gelen kurs verilerini işleme
     const handleCoursesData = (event, data) => {
       const newCourses = data.map((course, index) => {
         const normalizedCourse = Object.keys(course).reduce((acc, key) => {
@@ -36,7 +37,8 @@ const CoursesProvider = ({ children }) => {
           courseCode: normalizedCourse["coursecode"] || "N/A",
           students: Array.isArray(normalizedCourse["students"])
             ? normalizedCourse["students"]
-            : normalizedCourse["students"]?.split(",").map((s) => s.trim()) || [],
+            : normalizedCourse["students"]?.split(",").map((s) => s.trim()) ||
+              [],
         };
       });
 
@@ -69,6 +71,7 @@ const CoursesProvider = ({ children }) => {
 
   // Yeni kurs ekleme fonksiyonu
   const addCourse = (newCourse) => {
+    console.log("Adding new course:", newCourse); // Debugging için
     setCourses((prevCourses) => {
       const updatedCourses = [...prevCourses, newCourse];
       localStorage.setItem("courses", JSON.stringify(updatedCourses));
@@ -78,6 +81,7 @@ const CoursesProvider = ({ children }) => {
 
   // Kurs silme fonksiyonu
   const deleteCourse = (id) => {
+    console.log("Deleting course with ID:", id); // Debugging için
     setCourses((prevCourses) => {
       const updatedCourses = prevCourses.filter((course) => course.id !== id);
       localStorage.setItem("courses", JSON.stringify(updatedCourses));
@@ -87,8 +91,19 @@ const CoursesProvider = ({ children }) => {
 
   // Kurs güncelleme fonksiyonu
   const updateCourse = (updatedCourses) => {
-    setCourses(updatedCourses);
-    localStorage.setItem("courses", JSON.stringify(updatedCourses));
+    try {
+      console.log("Updating Courses with:", updatedCourses);
+
+      const coursesCopy = [...updatedCourses]; // Yeni referans oluştur
+
+      setCourses(coursesCopy); // React state'i güncelle
+
+      localStorage.setItem("courses", JSON.stringify(coursesCopy)); // Yerel depolamayı güncelle
+
+      console.log("Courses Successfully Updated:", coursesCopy);
+    } catch (error) {
+      console.error("Error updating courses:", error);
+    }
   };
 
   return (
