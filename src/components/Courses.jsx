@@ -43,12 +43,12 @@ function Courses() {
     const classroomSchedules = {};
 
     classrooms.forEach((classroom) => {
-      // Her sınıf için 16x5'lik bir tablo oluştur
-      const schedule = [];
-      for (let i = 0; i < 16; i++) {
-        const row = new Array(5).fill(null); // 5 günlük boş bir satır oluştur
-        schedule.push(row);
-      }
+      // LocalStorage'dan mevcut programı al
+      const savedSchedule =
+        JSON.parse(localStorage.getItem(`schedule_${classroom.name}`)) || [];
+      const schedule = savedSchedule.length
+        ? savedSchedule
+        : Array.from({ length: 16 }, () => new Array(5).fill(null));
       classroomSchedules[classroom.name] = schedule; // Sınıfın adına göre tabloyu sakla
     });
 
@@ -85,10 +85,6 @@ function Courses() {
           const duration = parseInt(course.duration, 10);
 
           if (dayIndex === -1 || startSlot === -1 || duration <= 0) {
-            console.log(dayIndex);
-            console.log(startSlot);
-            console.log(duration);
-
             console.warn(
               `Invalid day or time for course: ${course.courseName}`
             );
@@ -100,11 +96,16 @@ function Courses() {
             .slice(startSlot, startSlot + duration)
             .some((row) => row[dayIndex] !== null);
 
+          // Art arda aynı dersin sınıfta olmamasını sağlamak için kontrol ekle
+          const hasBackToBackConflict =
+            schedule[startSlot - 1]?.[dayIndex] === course.courseName ||
+            schedule[startSlot + duration]?.[dayIndex] === course.courseName;
+
           // Kapasite kontrolü
           const isCapacitySufficient =
             classroom.capacity >= (course.students?.length || 0);
 
-          if (!hasConflict && isCapacitySufficient) {
+          if (!hasConflict && !hasBackToBackConflict && isCapacitySufficient) {
             // Kursu sınıfa ata
             for (let i = startSlot; i < startSlot + duration; i++) {
               schedule[i][dayIndex] = course.courseName;
@@ -126,6 +127,16 @@ function Courses() {
 
     // Güncellenen kursları kaydet
     updateCourse(updatedCourses);
+
+    // Sınıf programlarını güncelle ve localStorage'a kaydet
+    classrooms.forEach((classroom) => {
+      const schedule = classroomSchedules[classroom.name];
+      classroom.schedule = schedule;
+      localStorage.setItem(
+        `schedule_${classroom.name}`,
+        JSON.stringify(schedule)
+      );
+    });
 
     // Atanamayan kursları raporla
     if (unassignedCourses.length > 0) {

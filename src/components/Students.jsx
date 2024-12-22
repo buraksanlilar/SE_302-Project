@@ -1,7 +1,7 @@
 import React, { useState, useContext } from "react";
 import { StudentsContext } from "../context/StudentsContext";
 import { ClassroomContext } from "../context/ClassroomContext";
-import WeeklySchedule from "./weeklySchedule";
+import WeeklySchedule from "./WeeklySchedule";
 import "./StudentManagement.css";
 
 function Students() {
@@ -31,7 +31,7 @@ function Students() {
       .normalize("NFKD") // Unicode normalization
       .replace(/[\u0300-\u036f]/g, ""); // Diakritik işaretlerini kaldırır
   };
-  
+
   const filteredStudents = students.filter((student) => {
     const studentNameNormalized = normalizeString(student.name);
     const searchNormalized = normalizeString(search);
