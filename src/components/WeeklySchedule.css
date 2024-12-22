@@ -58,5 +58,13 @@ button:hover {
   z-index: 1000;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
 }
- 
+ .notification {
+  color: white;
+  background-color: green;
+  padding: 10px;
+  border-radius: 5px;
+  margin-top: 10px;
+  text-align: center;
+}
+
  
