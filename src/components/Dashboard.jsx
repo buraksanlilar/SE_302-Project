@@ -4,7 +4,7 @@ import { TeachersContext } from "../context/TeachersContext";
 import { ClassroomContext } from "../context/ClassroomContext";
 import { StudentsContext } from "../context/StudentsContext";
 import "./Dashboard.css";
-import WeeklySchedule from "./weeklySchedule";
+//import WeeklySchedule from "./weeklySchedule";
 
 function Dashboard({ setActiveTab }) {
   const { classrooms } = useContext(ClassroomContext);
@@ -21,8 +21,8 @@ function Dashboard({ setActiveTab }) {
 
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
   const hours = [
-    "08:30",
-    "09:25",
+    "8:30",
+    "9:25",
     "10:20",
     "11:15",
     "13:00",

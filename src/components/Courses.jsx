@@ -19,31 +19,40 @@ function Courses() {
 
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
   const hours = [
-    "08:30",
-    "09:25",
+    "8:30",
+    "9:25",
     "10:20",
     "11:15",
-    "13:00",
-    "13:55",
-    "14:50",
-    "15:45",
-    "16:40",
+    "12:10",
+    "13:05",
+    "14:00",
+    "14:55",
+    "15:50",
+    "16:45",
     "17:40",
     "18:35",
     "19:30",
     "20:25",
-    "21:20",
   ];
 
   const autoAssignCourses = () => {
     const updatedCourses = [...courses]; // Kursların kopyasını al
   
     // Tüm sınıfların haftalık programlarını takip etmek için bir yapı oluştur
-    const classroomSchedules = classrooms.reduce((acc, classroom) => {
-      acc[classroom.name] = Array.from({ length: 16 }, () => Array(5).fill(null));
-      return acc;
-    }, {});
-  
+    const classroomSchedules = {};
+
+    classrooms.forEach((classroom) => {
+      // Her sınıf için 16x5'lik bir tablo oluştur
+      const schedule = [];
+      for (let i = 0; i < 16; i++) {
+        const row = new Array(5).fill(null); // 5 günlük boş bir satır oluştur
+        schedule.push(row);
+      }
+      classroomSchedules[classroom.name] = schedule; // Sınıfın adına göre tabloyu sakla
+    });
+    
+    console.log("Classroom Schedules Initialized:", classroomSchedules);
+    
     const unassignedCourses = []; // Atanamayan kursları kaydetmek için
   
     updatedCourses.forEach((course) => {
@@ -103,6 +112,7 @@ function Courses() {
         }
       }
     });
+    
   
     // Güncellenen kursları kaydet
     updateCourse(updatedCourses);
