@@ -186,7 +186,6 @@ const StudentsContextProvider = ({ children }) => {
           row.some((slot) => slot === course.courseName)
         );
         if (isAlreadyAdded) {
-          console.log(`Skipping already added course: ${course.courseName}`);
           return;
         }
 
