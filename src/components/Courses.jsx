@@ -19,6 +19,9 @@ function Courses() {
   const [duration, setDuration] = useState("");
   const [students, setStudents] = useState("");
 
+  const [editCourse, setEditCourse] = useState(null); // Düzenlenecek kurs
+  const [newClassroomForEdit, setNewClassroomForEdit] = useState(""); // Yeni sınıf seçimi
+
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
   const hours = [
     "8:30",
@@ -127,7 +130,7 @@ function Courses() {
     });
 
     // Güncellenen kursları kaydet
-    updateCourse(updatedCourses);
+    updatedCourses.forEach((course) => updateCourse(course));
 
     // Sınıf programlarını güncelle ve localStorage'a kaydet
     classrooms.forEach((classroom) => {
@@ -303,6 +306,20 @@ function Courses() {
         : [],
     };
 
+    if (
+      courses.some(
+        (course) =>
+          course.classroom === newCourseData.classroom &&
+          course.day === newCourseData.day &&
+          course.hour === newCourseData.hour
+      )
+    ) {
+      alert(
+        `Conflict detected: Another course is scheduled in ${newCourseData.classroom} on ${newCourseData.day} at ${newCourseData.hour}.`
+      );
+      return;
+    }
+
     addCourse(newCourseData);
     setNewCourse("");
     setSelectedTeacher("");
@@ -311,6 +328,39 @@ function Courses() {
     setSelectedHour("");
     setDuration("");
     setStudents("");
+  };
+
+  const handleEditClassroom = () => {
+    if (!editCourse || !newClassroomForEdit) {
+      alert("Please select a course and a classroom!");
+      return;
+    }
+
+    const updatedCourse = { ...editCourse, classroom: newClassroomForEdit };
+
+    if (
+      courses.some(
+        (course) =>
+          course.classroom === updatedCourse.classroom &&
+          course.day === updatedCourse.day &&
+          course.hour === updatedCourse.hour &&
+          course.id !== updatedCourse.id
+      )
+    ) {
+      alert(
+        `Conflict detected: Another course is scheduled in ${updatedCourse.classroom} on ${updatedCourse.day} at ${updatedCourse.hour}.`
+      );
+      return;
+    }
+
+    const updatedCourses = courses.map((course) =>
+      course.id === editCourse.id ? updatedCourse : course
+    );
+
+    updateCourse(updatedCourses);
+    setEditCourse(null);
+    setNewClassroomForEdit("");
+    alert("Classroom updated successfully!");
   };
 
   return (
