@@ -33,11 +33,31 @@ export const ClassroomProvider = ({ children }) => {
   };
 
   const deleteClassroom = (id) => {
+    // Silinecek classroom'u bul
+    const classroomToDelete = classrooms.find(
+      (classroom) => classroom.id === id
+    );
+
+    if (!classroomToDelete) {
+      console.warn("Classroom not found for deletion.");
+      return;
+    }
+
+    // Classroom'u classrooms listesinden çıkar
     const updatedClassrooms = classrooms.filter(
       (classroom) => classroom.id !== id
     );
+
+    // Classroom'a ait schedule'ı localStorage'dan sil
+    localStorage.removeItem(`schedule_${classroomToDelete.name}`);
+
+    // State ve localStorage'ı güncelle
     setClassrooms(updatedClassrooms);
     localStorage.setItem("classrooms", JSON.stringify(updatedClassrooms));
+
+    console.log(
+      `Classroom "${classroomToDelete.name}" and its schedule have been deleted.`
+    );
   };
 
   return (

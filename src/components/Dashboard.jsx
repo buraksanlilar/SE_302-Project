@@ -4,7 +4,7 @@ import { TeachersContext } from "../context/TeachersContext";
 import { ClassroomContext } from "../context/ClassroomContext";
 import { StudentsContext } from "../context/StudentsContext";
 import "./Dashboard.css";
-//import WeeklySchedule from "./weeklySchedule";
+import WeeklySchedule from "./WeeklySchedule";
 
 function Dashboard({ setActiveTab }) {
   const { classrooms } = useContext(ClassroomContext);
@@ -15,7 +15,6 @@ function Dashboard({ setActiveTab }) {
   const [selectedCard, setSelectedCard] = useState(null);
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [selectedClassroom, setSelectedClassroom] = useState(null);
-  const [selectedStudent, setSelectedStudent] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [classroomSearchQuery, setClassroomSearchQuery] = useState("");
 
@@ -25,16 +24,16 @@ function Dashboard({ setActiveTab }) {
     "9:25",
     "10:20",
     "11:15",
-    "13:00",
-    "13:55",
-    "14:50",
-    "15:45",
-    "16:40",
+    "12:10",
+    "13:05",
+    "14:00",
+    "14:55",
+    "15:50",
+    "16:45",
     "17:40",
     "18:35",
     "19:30",
     "20:25",
-    "21:20",
   ];
 
   const filteredCourses = courses.filter((course) =>
@@ -170,12 +169,7 @@ function Dashboard({ setActiveTab }) {
             </h4>
             <ul>
               {courseStudents.map((student) => (
-                <li key={`${student.id}-${student.name}`}>
-                  {student.name}
-                  <button onClick={() => setSelectedStudent(student)}>
-                    View Schedule
-                  </button>
-                </li>
+                <li key={`${student.id}-${student.name}`}>{student.name}</li>
               ))}
             </ul>
             <button

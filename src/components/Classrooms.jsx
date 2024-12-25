@@ -7,7 +7,7 @@ function Classrooms() {
   const { classrooms, addClassroom, deleteClassroom } =
     useContext(ClassroomContext);
   const { courses } = useContext(CoursesContext);
-
+  const [message, setMessage] = useState({ text: "", type: "" });
   const [selectedClassroom, setSelectedClassroom] = useState(null);
   const [newClassroom, setNewClassroom] = useState("");
   const [capacity, setCapacity] = useState("");
@@ -55,11 +55,25 @@ function Classrooms() {
   };
 
   const handleAddClassroom = () => {
-    if (newClassroom && capacity > 0) {
-      addClassroom({ id: Date.now(), name: newClassroom, capacity });
-      setNewClassroom("");
-      setCapacity("");
+    if (!newClassroom.trim()) {
+      setMessage({ text: "Classroom name cannot be empty!", type: "error" });
+      return;
     }
+    if (capacity <= 0) {
+      setMessage({ text: "Capacity must be greater than 0!", type: "error" });
+      return;
+    }
+
+    addClassroom({ id: Date.now(), name: newClassroom.trim(), capacity });
+    setNewClassroom("");
+    setCapacity("");
+    setMessage({
+      text: `"${newClassroom.trim()}" has been successfully added.`,
+      type: "success",
+    });
+    setTimeout(() => {
+      setMessage({ text: "", type: "" });
+    }, 2000);
   };
 
   return (
@@ -81,6 +95,13 @@ function Classrooms() {
         <button onClick={handleAddClassroom}>Add Classroom</button>
       </div>
 
+      {/* Mesaj Gösterimi */}
+      {message.text && (
+        <p style={{ color: message.type === "success" ? "green" : "red" }}>
+          {message.text}
+        </p>
+      )}
+
       <ul>
         {classrooms.map((classroom) => (
           <li key={`${classroom.id}-${classroom.name}`}>
@@ -88,7 +109,15 @@ function Classrooms() {
             <button onClick={() => setSelectedClassroom(classroom)}>
               Weekly Schedule
             </button>
-            <button onClick={() => deleteClassroom(classroom.id)}>
+            <button
+              onClick={() => {
+                deleteClassroom(classroom.id);
+                setMessage({
+                  text: `"${classroom.name}" has been deleted.`,
+                  type: "success",
+                });
+              }}
+            >
               Delete
             </button>
           </li>

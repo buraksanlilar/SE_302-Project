@@ -80,7 +80,6 @@ function createWindow() {
             }
           },
         },
-        { label: 'Export', click: () => console.log('Save Clicked') },
         { type: 'separator' },
         { label: 'Exit', role: 'quit' },
       ],
@@ -99,10 +98,6 @@ function createWindow() {
     {
       label: 'View',
       submenu: [{ role: 'reload' }, { role: 'toggleDevTools' }],
-    },
-    {
-      label: 'Help',
-      submenu: [{ label: 'About', click: () => console.log('About Clicked') }],
     },
   ];
 

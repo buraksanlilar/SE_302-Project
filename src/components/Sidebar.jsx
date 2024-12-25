@@ -1,8 +1,44 @@
 import React, { useState } from "react";
+import { saveAs } from "file-saver"; // File-Saver kitaplığı
 import "./Sidebar.css";
 
 function Sidebar({ activeTab, setActiveTab }) {
   const [showAboutModal, setShowAboutModal] = useState(false);
+
+  const exportToCSV = (data, filename) => {
+    const keys = Object.keys(data[0] || {});
+    const csvContent =
+      keys.join(",") +
+      "\n" +
+      data
+        .map((row) =>
+          keys
+            .map((key) =>
+              typeof row[key] === "string" ? `"${row[key]}"` : row[key]
+            )
+            .join(",")
+        )
+        .join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    saveAs(blob, filename);
+  };
+
+  const handleExport = () => {
+    // Courses
+    const courses = JSON.parse(localStorage.getItem("courses")) || [];
+    if (courses.length) {
+      exportToCSV(courses, "CoursesExport.csv");
+    }
+
+    // Classrooms
+    const classrooms = JSON.parse(localStorage.getItem("classrooms")) || [];
+    if (classrooms.length) {
+      exportToCSV(classrooms, "ClassroomsExport.csv");
+    }
+
+    alert("Export işlemi tamamlandı!");
+  };
 
   return (
     <>
@@ -39,6 +75,7 @@ function Sidebar({ activeTab, setActiveTab }) {
           >
             Courses
           </li>
+          <li onClick={handleExport}>Export Courses & Classrooms</li>
           <li onClick={() => setShowAboutModal(true)}>Help</li>
         </ul>
       </div>
@@ -65,8 +102,8 @@ function Sidebar({ activeTab, setActiveTab }) {
                 View and edit their weekly schedules.
               </li>
               <li>
-                <strong>Teachers:</strong> Maintain your teaching staff list
-                and manage course assignments.
+                <strong>Teachers:</strong> Maintain your teaching staff list and
+                manage course assignments.
               </li>
               <li>
                 <strong>Classrooms:</strong> Check classroom availability, add
@@ -94,7 +131,8 @@ function Sidebar({ activeTab, setActiveTab }) {
             </ul>
             <h3>Version Information</h3>
             <p>
-              <strong>Version:</strong> 1.0.1<br />
+              <strong>Version:</strong> 1.0.1
+              <br />
               <strong>Release Date:</strong> December 2024
             </p>
             <h3>Developed By</h3>
