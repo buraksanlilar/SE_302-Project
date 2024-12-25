@@ -19,9 +19,6 @@ function Courses() {
   const [duration, setDuration] = useState("");
   const [students, setStudents] = useState("");
 
-  const [editCourse, setEditCourse] = useState(null); // Düzenlenecek kurs
-  const [newClassroomForEdit, setNewClassroomForEdit] = useState(""); // Yeni sınıf seçimi
-
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
   const hours = [
     "8:30",
@@ -115,6 +112,8 @@ function Courses() {
               schedule[i][dayIndex] = course.courseName;
             }
             course.classroom = classroom.name;
+            console.log(classroom.capacity);
+            console.log(course.students.length);
             assigned = true;
             break;
           }
@@ -130,7 +129,7 @@ function Courses() {
     });
 
     // Güncellenen kursları kaydet
-    updatedCourses.forEach((course) => updateCourse(course));
+    updateCourse(updatedCourses);
 
     // Sınıf programlarını güncelle ve localStorage'a kaydet
     classrooms.forEach((classroom) => {
@@ -148,13 +147,13 @@ function Courses() {
         `Unassigned courses (${unassignedCourses.length}):`,
         unassignedCourses
       );
-      alert(
+      setErrorMessage(
         `Some courses could not be assigned:\n${unassignedCourses
           .map((c) => `${c.course}: ${c.reason}`)
           .join("\n")}`
       );
     } else {
-      alert("All courses have been successfully assigned!");
+      setErrorMessage("All courses have been successfully assigned!");
     }
   };
   const handleEditCourse = (course) => {
@@ -175,7 +174,25 @@ function Courses() {
       return;
     }
 
-    // Yeni sınıfın programını al
+    const selectedClassroomDetails = classrooms.find(
+      (classroom) => classroom.name === selectedClassroom
+    );
+
+    if (!selectedClassroomDetails) {
+      setErrorMessage("Selected classroom not found.");
+      return;
+    }
+
+    const courseStudentCount = editCourse.students?.length || 0;
+    const classroomCapacity = selectedClassroomDetails.capacity;
+
+    if (courseStudentCount > classroomCapacity) {
+      setErrorMessage(
+        `Classroom capacity (${classroomCapacity}) is insufficient for ${courseStudentCount} students.`
+      );
+      return;
+    }
+
     const savedSchedule =
       JSON.parse(localStorage.getItem(`schedule_${selectedClassroom}`)) || [];
     const schedule =
@@ -190,15 +207,12 @@ function Courses() {
     const normalizedCourseHour = normalizeTimeFormat(editCourse.hour.trim());
     const startSlot = timeSlots.indexOf(normalizedCourseHour);
     const duration = parseInt(editCourse.duration, 10);
-    console.log(dayIndex);
-    console.log(startSlot);
-    console.log(duration);
+
     if (dayIndex === -1 || startSlot === -1 || duration <= 0) {
       setErrorMessage("Invalid course data.");
       return;
     }
 
-    // Çakışma kontrolü
     const hasConflict = schedule
       .slice(startSlot, startSlot + duration)
       .some((slot) => slot[dayIndex] !== null);
@@ -210,7 +224,6 @@ function Courses() {
       return;
     }
 
-    // Eski sınıfın programını güncelle
     if (editCourse.classroom) {
       const oldSchedule =
         JSON.parse(localStorage.getItem(`schedule_${editCourse.classroom}`)) ||
@@ -229,7 +242,6 @@ function Courses() {
       );
     }
 
-    // Yeni sınıfın programını güncelle
     const newSchedule = schedule.map((row) => [...row]);
 
     for (let i = 0; i < duration; i++) {
@@ -243,7 +255,6 @@ function Courses() {
       JSON.stringify(newSchedule)
     );
 
-    // Kursu güncelle
     const updatedCourses = courses.map((course) =>
       course.id === editCourse.id
         ? { ...editCourse, classroom: selectedClassroom }
@@ -289,7 +300,10 @@ function Courses() {
       !selectedHour ||
       !duration
     ) {
-      alert("Please fill in all fields!");
+      setErrorMessage("Please fill in all fields!");
+      setTimeout(() => {
+        setErrorMessage("");
+      }, 2000);
       return;
     }
 
@@ -306,20 +320,6 @@ function Courses() {
         : [],
     };
 
-    if (
-      courses.some(
-        (course) =>
-          course.classroom === newCourseData.classroom &&
-          course.day === newCourseData.day &&
-          course.hour === newCourseData.hour
-      )
-    ) {
-      alert(
-        `Conflict detected: Another course is scheduled in ${newCourseData.classroom} on ${newCourseData.day} at ${newCourseData.hour}.`
-      );
-      return;
-    }
-
     addCourse(newCourseData);
     setNewCourse("");
     setSelectedTeacher("");
@@ -328,39 +328,12 @@ function Courses() {
     setSelectedHour("");
     setDuration("");
     setStudents("");
-  };
-
-  const handleEditClassroom = () => {
-    if (!editCourse || !newClassroomForEdit) {
-      alert("Please select a course and a classroom!");
-      return;
-    }
-
-    const updatedCourse = { ...editCourse, classroom: newClassroomForEdit };
-
-    if (
-      courses.some(
-        (course) =>
-          course.classroom === updatedCourse.classroom &&
-          course.day === updatedCourse.day &&
-          course.hour === updatedCourse.hour &&
-          course.id !== updatedCourse.id
-      )
-    ) {
-      alert(
-        `Conflict detected: Another course is scheduled in ${updatedCourse.classroom} on ${updatedCourse.day} at ${updatedCourse.hour}.`
-      );
-      return;
-    }
-
-    const updatedCourses = courses.map((course) =>
-      course.id === editCourse.id ? updatedCourse : course
+    setErrorMessage(
+      ` "${newCourseData.courseName}" has been successfully added.`
     );
-
-    updateCourse(updatedCourses);
-    setEditCourse(null);
-    setNewClassroomForEdit("");
-    alert("Classroom updated successfully!");
+    setTimeout(() => {
+      setErrorMessage("");
+    }, 2000);
   };
 
   return (
@@ -436,7 +409,7 @@ function Courses() {
           Auto Assign
         </button>
       </div>
-
+      {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
       <ul>
         {courses?.map((course, index) => (
           <li key={`${course.id}-${index}`}>

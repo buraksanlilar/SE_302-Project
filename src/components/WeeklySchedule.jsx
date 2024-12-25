@@ -88,8 +88,6 @@ function WeeklySchedule({ student, updateSchedule }) {
     // Yerel depolamayı kontrol et
     const savedCourses = JSON.parse(localStorage.getItem("courses"));
     console.log("LocalStorage Courses After Update:", savedCourses);
-
-    alert("Schedule saved successfully!");
   };
 
   const placeCourseAutomatically = () => {
