@@ -27,7 +27,17 @@ const StudentsContextProvider = ({ children }) => {
       setCoursesProcessed(true); // Kursların işlendiğini işaretle
     }
   }, [students, coursesProcessed]); // coursesProcessed kontrolü ile tekrar çalışmasını engelle
-
+  const removeCourseFromSchedules = (courseName) => {
+    setStudents((prevStudents) =>
+      prevStudents.map((student) => {
+        const updatedSchedule = student.weeklySchedule.map((row) =>
+          row.map((course) => (course === courseName ? null : course))
+        );
+        return { ...student, weeklySchedule: updatedSchedule };
+      })
+    );
+  };
+  
   // Yeni öğrenci ekleme fonksiyonu
   const addStudent = (newStudent) => {
     setStudents((prevStudents) => {
@@ -290,6 +300,7 @@ const StudentsContextProvider = ({ children }) => {
         updateStudent,
         deleteStudent,
         addCoursesToStudents,
+        removeCourseFromSchedules,
       }}
     >
       {children}

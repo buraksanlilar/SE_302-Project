@@ -1,4 +1,5 @@
-import React, { createContext, useState, useEffect } from "react";
+import React, { createContext, useState, useEffect, useContext } from "react";
+import { StudentsContext } from "./StudentsContext";
 
 export const CoursesContext = createContext();
 
@@ -7,6 +8,10 @@ const CoursesProvider = ({ children }) => {
     const savedCourses = JSON.parse(localStorage.getItem("courses"));
     return savedCourses || [];
   });
+
+  // StudentsContext'ten gerekli fonksiyonları çekin
+  const { students, updateStudent, removeCourseFromSchedules } =
+    useContext(StudentsContext);
 
   useEffect(() => {
     // Electron'dan gelen kurs verilerini işleme
@@ -32,13 +37,15 @@ const CoursesProvider = ({ children }) => {
           teacherName: normalizedCourse["lecturer"] || "Unknown Lecturer",
           day: day,
           hour: hour,
-          duration: normalizedCourse["durationinlecturehours"]?.trim() || "N/A",
+          duration:
+            normalizedCourse["durationinlecturehours"]?.trim() || "N/A",
           classroom: normalizedCourse["classroom"] || "Unknown Classroom",
           courseCode: normalizedCourse["coursecode"] || "N/A",
           students: Array.isArray(normalizedCourse["students"])
             ? normalizedCourse["students"]
-            : normalizedCourse["students"]?.split(",").map((s) => s.trim()) ||
-              [],
+            : normalizedCourse["students"]
+                ?.split(",")
+                .map((s) => s.trim()) || [],
         };
       });
 
@@ -81,12 +88,26 @@ const CoursesProvider = ({ children }) => {
 
   // Kurs silme fonksiyonu
   const deleteCourse = (id) => {
-    console.log("Deleting course with ID:", id); // Debugging için
+    const courseToDelete = courses.find((course) => course.id === id);
+
+    if (!courseToDelete) {
+      console.warn("Course not found for deletion.");
+      return;
+    }
+
+    // Öğrenci programlarından kursu sil
+    removeCourseFromSchedules(courseToDelete.courseName);
+
+    // Kursları güncelle
     setCourses((prevCourses) => {
       const updatedCourses = prevCourses.filter((course) => course.id !== id);
       localStorage.setItem("courses", JSON.stringify(updatedCourses));
       return updatedCourses;
     });
+
+    console.log(
+      `Course "${courseToDelete.courseName}" has been deleted and removed from all schedules.`
+    );
   };
 
   // Kurs güncelleme fonksiyonu
