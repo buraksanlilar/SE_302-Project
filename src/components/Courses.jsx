@@ -9,7 +9,8 @@ function Courses() {
     useContext(CoursesContext);
   const { teachers } = useContext(TeachersContext);
   const { classrooms } = useContext(ClassroomContext);
-
+  const [editCourse, setEditCourse] = useState(null);
+  const [errorMessage, setErrorMessage] = useState("");
   const [newCourse, setNewCourse] = useState("");
   const [selectedClassroom, setSelectedClassroom] = useState("");
   const [selectedTeacher, setSelectedTeacher] = useState("");
@@ -153,6 +154,104 @@ function Courses() {
       alert("All courses have been successfully assigned!");
     }
   };
+  const handleEditCourse = (course) => {
+    setEditCourse(course);
+    setSelectedClassroom(course.classroom || ""); // Mevcut sınıfı seçili yap
+  };
+  const normalizeTimeFormat = (time) => {
+    const [hour, minute] = time.split(":").map((t) => parseInt(t, 10));
+    return `${String(hour).padStart(2, "0")}:${String(minute).padStart(
+      2,
+      "0"
+    )}`;
+  };
+
+  const handleSaveEdit = () => {
+    if (!editCourse || !selectedClassroom) {
+      setErrorMessage("Please select a classroom.");
+      return;
+    }
+
+    // Yeni sınıfın programını al
+    const savedSchedule =
+      JSON.parse(localStorage.getItem(`schedule_${selectedClassroom}`)) || [];
+    const schedule =
+      savedSchedule.length > 0
+        ? savedSchedule
+        : Array.from({ length: 16 }, () => new Array(5).fill(null));
+
+    const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+    const timeSlots = generateTimeSlots();
+
+    const dayIndex = days.indexOf(editCourse.day);
+    const normalizedCourseHour = normalizeTimeFormat(editCourse.hour.trim());
+    const startSlot = timeSlots.indexOf(normalizedCourseHour);
+    const duration = parseInt(editCourse.duration, 10);
+    console.log(dayIndex);
+    console.log(startSlot);
+    console.log(duration);
+    if (dayIndex === -1 || startSlot === -1 || duration <= 0) {
+      setErrorMessage("Invalid course data.");
+      return;
+    }
+
+    // Çakışma kontrolü
+    const hasConflict = schedule
+      .slice(startSlot, startSlot + duration)
+      .some((slot) => slot[dayIndex] !== null);
+
+    if (hasConflict) {
+      setErrorMessage(
+        `Classroom "${selectedClassroom}" is not available at ${editCourse.day} ${editCourse.hour}.`
+      );
+      return;
+    }
+
+    // Eski sınıfın programını güncelle
+    if (editCourse.classroom) {
+      const oldSchedule =
+        JSON.parse(localStorage.getItem(`schedule_${editCourse.classroom}`)) ||
+        [];
+      const oldScheduleUpdated = oldSchedule.map((row) => [...row]);
+
+      for (let i = 0; i < duration; i++) {
+        if (startSlot + i < oldScheduleUpdated.length) {
+          oldScheduleUpdated[startSlot + i][dayIndex] = null;
+        }
+      }
+
+      localStorage.setItem(
+        `schedule_${editCourse.classroom}`,
+        JSON.stringify(oldScheduleUpdated)
+      );
+    }
+
+    // Yeni sınıfın programını güncelle
+    const newSchedule = schedule.map((row) => [...row]);
+
+    for (let i = 0; i < duration; i++) {
+      if (startSlot + i < newSchedule.length) {
+        newSchedule[startSlot + i][dayIndex] = editCourse.courseName;
+      }
+    }
+
+    localStorage.setItem(
+      `schedule_${selectedClassroom}`,
+      JSON.stringify(newSchedule)
+    );
+
+    // Kursu güncelle
+    const updatedCourses = courses.map((course) =>
+      course.id === editCourse.id
+        ? { ...editCourse, classroom: selectedClassroom }
+        : course
+    );
+
+    updateCourse(updatedCourses);
+    setEditCourse(null);
+    setSelectedClassroom("");
+    setErrorMessage("");
+  };
 
   function generateTimeSlots() {
     const slots = [];
@@ -230,7 +329,7 @@ function Courses() {
         onChange={(e) => setSelectedClassroom(e.target.value)}
       >
         <option value="">Select Classroom</option>
-        {classrooms.map((classroom, index) => (
+        {classrooms?.map((classroom, index) => (
           <option key={`${classroom.id}-${index}`} value={classroom.name}>
             {classroom.name}
           </option>
@@ -242,7 +341,7 @@ function Courses() {
         onChange={(e) => setSelectedTeacher(e.target.value)}
       >
         <option value="">Select Teacher</option>
-        {teachers.map((teacher, index) => (
+        {teachers?.map((teacher, index) => (
           <option key={`${teacher.id}-${index}`} value={teacher.name}>
             {teacher.name}
           </option>
@@ -289,7 +388,7 @@ function Courses() {
       </div>
 
       <ul>
-        {courses.map((course, index) => (
+        {courses?.map((course, index) => (
           <li key={`${course.id}-${index}`}>
             {course.courseName} | {course.teacherName} | {course.day} |{" "}
             {course.hour} | Classroom: {course.classroom || "Not Assigned"} |
@@ -300,9 +399,42 @@ function Courses() {
             >
               Delete
             </button>
+            <button
+              className="edit-button"
+              onClick={() => handleEditCourse(course)}
+            >
+              Edit
+            </button>
           </li>
         ))}
       </ul>
+
+      {editCourse && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h4>Edit Classroom for {editCourse.courseName}</h4>
+
+            <select
+              value={selectedClassroom}
+              onChange={(e) => setSelectedClassroom(e.target.value)}
+            >
+              <option value="">Select Classroom</option>
+              {classrooms?.map((classroom, index) => (
+                <option key={`${classroom.id}-${index}`} value={classroom.name}>
+                  {classroom.name}
+                </option>
+              ))}
+            </select>
+
+            {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
+
+            <div className="button-group">
+              <button onClick={handleSaveEdit}>Save</button>
+              <button onClick={() => setEditCourse(null)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
