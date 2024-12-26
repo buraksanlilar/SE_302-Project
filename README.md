@@ -1,30 +1,143 @@
-# React + TypeScript + Vite
+Campus Dashboard 
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Overview 
 
-Currently, two official plugins are available:
+Campus Dashboard is a comprehensive management application for educational institutions. It facilitates efficient management of students, teachers, classrooms, and courses, providing essential tools for scheduling and resource organization. 
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+                       
 
-## Expanding the ESLint configuration
+Features 
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- Dashboard Overview: Quick insights into total students, teachers, classrooms, and courses. Interactive cards for exploring detailed information. 
 
-- Configure the top-level `parserOptions` property like this:
+- Student Management: Add, update, and delete student records. View and edit weekly schedules. 
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
-```
+                             
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+                                    
+
+                           
+
+ 
+
+- Teacher Management: Maintain and manage the list of teaching staff. Assign courses to teachers. 
+
+                              
+
+ 
+
+                                   
+
+- Classroom Management: Add, update, and delete classrooms. Check classroom availability and schedules. 
+
+                  
+
+                                                           
+
+- Course Management: Create, update, and delete courses. Automatically assign classrooms based on capacity and availability. Detect and handle scheduling conflicts.       
+
+                
+
+ 
+
+- Attendance Tracking: Track student attendance for specific courses. 
+
+Technologies Used 
+
+Frontend Framework: React.js 
+State Management: Context API 
+Backend Integration: Electron APIs 
+Storage: LocalStorage 
+Styling: CSS Modules 
+Libraries: UUID for unique student IDs, CSV support for data import/export 
+
+Setup 
+
+Clone the repository: 
+   git clone https://github.com/your-repo-url.git 
+   cd campus-dashboard 
+
+Install dependencies: 
+   npm install 
+
+Start the application: 
+   npm start 
+
+To build the application for production: 
+   npm run build 
+
+Usage 
+
+- Dashboard Tab: View an overview of total resources. 
+
+- Students Tab: Add and manage student records. Edit weekly schedules. 
+
+- Teachers Tab: Add and manage teacher records. 
+
+- Classrooms Tab: Manage classroom details and schedules. 
+
+- Courses Tab: Add, assign, and organize courses. 
+
+- Attendance Tab: Mark and track student attendance. 
+
+Application Architecture 
+
+Contexts: 
+
+- CoursesContext: Manage course data including addition, updates, and auto-assignment. Handle scheduling conflicts and persist data in LocalStorage. 
+
+- ClassroomContext: Manage classroom data and weekly schedules. Integrate with Electron APIs for data updates. 
+
+- StudentsContext: Add, update, and delete students. Manage student weekly schedules and handle course additions. 
+
+- TeachersContext: Maintain a list of teaching staff and manage course assignments. 
+
+Key Components: 
+
+- Dashboard.jsx: Interactive dashboard overview. 
+
+- Students.jsx: Student management panel with schedule editing. 
+
+- Teachers.jsx: Teacher management interface. 
+
+- Classrooms.jsx: Classroom management and schedule visualization. 
+
+- Courses.jsx: Course creation and auto-assignment system. 
+
+- Attendance.jsx: Attendance tracking tool. 
+
+- Sidebar.jsx: Navigation bar for tab switching. 
+
+Key Features 
+
+- Automated Scheduling: Intelligent assignment of courses to classrooms based on capacity and availability. 
+
+- Conflict Detection: Real-time alerts for scheduling conflicts. 
+
+- Data Management: Import/export data using CSV files for seamless updates. 
+
+Contribution 
+
+Contributions are welcome! Please follow the steps below: 
+1. Fork the repository. 
+2. Create a feature branch: 
+   git checkout -b feature-name 
+3. Commit your changes: 
+   git commit -m "Add new feature" 
+4. Push to the branch: 
+   git push origin feature-name 
+5. Create a pull request. 
+
+License 
+
+This project is licensed under the MIT License. 
+
+Developers 
+
+- Selen ÖZNUR - [GitHub](https://github.com/selenoznur) (20220602062) 
+
+- Özcan Burak ŞANLILAR - [GitHub](https://github.com/buraksanlilar) (20210602058) 
+
+- Kadir AY - [GitHub](https://github.com/sucreistaken) (20210602006) 
+
+- Orkun Efe ÖZDEMİR (20220602061) 
