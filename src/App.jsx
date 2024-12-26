@@ -18,23 +18,22 @@ function App() {
 
   return (
     <StudentsProvider>
-      <TeachersContextProvider>
+      <CoursesProvider>
         <ClassroomProvider>
-          <CoursesProvider>
+          <TeachersContextProvider>
             <div className="app-container">
               <Sidebar setActiveTab={setActiveTab} />
               <div className="content">
                 {activeTab === "dashboard" && <Dashboard />}
-
                 {activeTab === "students" && <Students />}
                 {activeTab === "teachers" && <Teachers />}
                 {activeTab === "classrooms" && <Classrooms />}
                 {activeTab === "courses" && <Courses />}
               </div>
             </div>
-          </CoursesProvider>
+          </TeachersContextProvider>
         </ClassroomProvider>
-      </TeachersContextProvider>
+      </CoursesProvider>
     </StudentsProvider>
   );
 }

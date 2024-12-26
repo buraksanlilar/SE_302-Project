@@ -1,4 +1,5 @@
-import React, { createContext, useState, useEffect } from "react";
+import React, { createContext, useState, useEffect, useContext } from "react";
+import { CoursesContext } from "./CoursesContext";
 
 export const ClassroomContext = createContext();
 
@@ -8,17 +9,21 @@ export const ClassroomProvider = ({ children }) => {
     return savedClassrooms ? JSON.parse(savedClassrooms) : [];
   });
 
+  const { courses, setCourses } = useContext(CoursesContext);
+
   useEffect(() => {
     const handleClassroomData = (event, data) => {
       const formattedData = data.map((classroom) => ({
-        id: Date.now() + Math.random(), // Ensure unique ID
+        id: Date.now() + Math.random(), // Benzersiz ID oluştur
         name: classroom.classroom || classroom.name || "Unnamed Classroom",
         capacity: classroom.capacity || "Unknown Capacity",
       }));
+
       setClassrooms(formattedData);
       localStorage.setItem("classrooms", JSON.stringify(formattedData));
     };
 
+    // Electron API ile veri işleme
     window.electronAPI?.on("classroom-data", handleClassroomData);
 
     return () => {
@@ -33,7 +38,6 @@ export const ClassroomProvider = ({ children }) => {
   };
 
   const deleteClassroom = (id) => {
-    // Silinecek classroom'u bul
     const classroomToDelete = classrooms.find(
       (classroom) => classroom.id === id
     );
@@ -51,12 +55,29 @@ export const ClassroomProvider = ({ children }) => {
     // Classroom'a ait schedule'ı localStorage'dan sil
     localStorage.removeItem(`schedule_${classroomToDelete.name}`);
 
+    // CoursesContext'e erişip kursları güncelle
+    if (setCourses) {
+      setCourses((prevCourses) => {
+        const updatedCourses = prevCourses.map((course) =>
+          course.classroom === classroomToDelete.name
+            ? { ...course, classroom: "Unknown Classroom" }
+            : course
+        );
+        localStorage.setItem("courses", JSON.stringify(updatedCourses));
+        return updatedCourses;
+      });
+    } else {
+      console.warn(
+        "CoursesContext is not properly provided. Ensure ClassroomProvider is wrapped inside CoursesProvider."
+      );
+    }
+
     // State ve localStorage'ı güncelle
     setClassrooms(updatedClassrooms);
     localStorage.setItem("classrooms", JSON.stringify(updatedClassrooms));
 
     console.log(
-      `Classroom "${classroomToDelete.name}" and its schedule have been deleted.`
+      `Classroom "${classroomToDelete.name}" and its schedule have been deleted. Courses have been updated.`
     );
   };
 

@@ -1,154 +1,100 @@
-/* Button Group - Butonları yan yana hizalar */
-.button-group {
-  display: flex;
-  gap: 0; /* Butonlar arasında boşluğu kaldırır */
-  justify-content: flex-start; /* Butonları sola hizalar */
-}
-
-.button-group button {
-  margin: 0; /* Dış boşluğu sıfırlar */
-  border-radius: 0; /* Köşeleri kare yapar */
-}
-
-/* Weekly Schedule Butonu */
-.schedule-button {
-  background-color: #3498db; /* Mavi arka plan */
-  color: white;
-  border: none;
-  padding: 6px 12px;
-  font-size: 14px;
-  cursor: pointer;
-  border-top-left-radius: 4px; /* Sol köşeleri yuvarlar */
-  border-bottom-left-radius: 4px;
-  transition: background-color 0.3s ease;
-}
-
-.schedule-button:hover {
-  background-color: #006eb7; /* Hover efekti */
-}
-
-/* Delete Butonu */
-.delete-button {
-  background-color: #e74c3c; /* Kırmızı arka plan */
-  color: white;
-  border: none;
-  padding: 6px 12px;
-  font-size: 14px;
-  cursor: pointer;
-  border-top-right-radius: 4px; /* Sağ köşeleri yuvarlar */
-  border-bottom-right-radius: 4px;
-  margin-left: -1px; /* Çizgilerin birleşmesini sağlar */
-  transition: background-color 0.3s ease;
-}
-
-.delete-button:hover {
-  background-color: #c0392b; /* Hover efekti */
-}
-
-/* Genel Sınıf Konteyneri */
+/* Classrooms Konteyneri */
 .classrooms-container {
-  max-width: 800px;
+  max-width: 600px;
   margin: 20px auto;
-  padding: 15px;
-  background-color: #ffffff;
+  padding: 20px;
+  background: #ffffff;
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
-
+ 
 .classrooms-container h3 {
+  margin-bottom: 20px;
   font-size: 22px;
   color: #333;
   text-align: center;
-  margin-bottom: 20px;
+  font-weight: bold;
 }
-
-/* Listeleme */
-ul {
+ 
+/* Listeleme için */
+.classrooms-container ul {
   list-style: none;
   padding: 0;
+  margin: 20px 0;
 }
-
-li {
-  background-color: #f9f9f9;
-  margin: 10px 0;
+ 
+.classrooms-container ul li {
+  background: #f9f9f9;
+  margin-bottom: 10px;
   padding: 10px 15px;
-  border-radius: 4px;
+  border-radius: 6px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease;
 }
-
-li:hover {
+ 
+.classrooms-container ul li:hover {
   background-color: #f4f4f4;
 }
-
+ 
+/* Butonlar */
+.classrooms-container ul li button {
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: bold;
+  background: #e74c3c;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+ 
+.classrooms-container ul li button:hover {
+  background: #c0392b;
+}
+ 
 /* Form Elemanları */
-.form-group input {
-  display: inline-block;
+.classrooms-container input,
+.classrooms-container select {
+  display: block;
+  width: 100%;
+  margin-bottom: 10px;
   padding: 8px 10px;
   font-size: 14px;
-  margin-right: 10px;
-  border: 1px solid #981d1d;
-  border-radius: 4px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #f9f9f9;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
-
-.form-group button {
-  padding: 8px 12px;
+ 
+.classrooms-container input:focus,
+.classrooms-container select:focus {
+  border-color: #3498db;
+  box-shadow: 0 0 6px rgba(52, 152, 219, 0.5);
+}
+ 
+/* Genel Buton Stili */
+.classrooms-container button {
+  padding: 8px 14px;
   font-size: 14px;
-  color: white;
-  background-color: #2ecc71; /* Yeşil */
+  font-weight: bold;
+  background: #3498db;
+  color: #ffffff;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
-
-.form-group button:hover {
-  background-color: #27ae60; /* Hover efekti */
+ 
+.classrooms-container button:hover {
+  background: #2980b9;
+  transform: translateY(-2px);
 }
-
-/* Modal Stil */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.modal-content {
-  background: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  width: 90%;
-  max-width: 500px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-  text-align: center;
-}
-
-.modal-content h4 {
-  margin-bottom: 0px;
-  margin-top: -1px;
-  font-size: 20px;
-}
-
-.modal-content button {
-  margin-top: 10px;
-  padding: 6px 12px;
-  background-color: #dc3545;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.modal-content button:hover {
-  background-color: #c82333;
+ 
+.classrooms-container button:active {
+  background: #1c6a96;
 }

@@ -88,7 +88,7 @@ function WeeklySchedule({ student, updateSchedule }) {
     const savedCourses = JSON.parse(localStorage.getItem("courses"));
     console.log("LocalStorage Courses After Update:", savedCourses);
 
-    alert("Schedule saved successfully!");
+    console.log("Schedule saved successfully!");
   };
 
   const placeCourseAutomatically = () => {
