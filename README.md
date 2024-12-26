@@ -14,16 +14,18 @@ Features
 - Student Management: Add, update, and delete student records. View and edit weekly schedules. 
 
                              
+![dashboard](src/assets/studentsearch.png)
 
-                                    
+![dashboard](src/assets/studenSelen.png)
 
-                           
+![dashboard](src/assets/weeklyscheduleforstudent.png)
 
  
 
 - Teacher Management: Maintain and manage the list of teaching staff. Assign courses to teachers. 
 
                               
+  ![dashboard](src/assets/teacherSearch.png)
 
  
 
@@ -31,13 +33,17 @@ Features
 
 - Classroom Management: Add, update, and delete classrooms. Check classroom availability and schedules. 
 
-                  
+   ![dashboard](src/assets/classroomSearch.png)
+   ![dashboard](src/assets/teachweeklyScheduleforclass.png)
+
+               
 
                                                            
 
 - Course Management: Create, update, and delete courses. Automatically assign classrooms based on capacity and availability. Detect and handle scheduling conflicts.       
 
-                
+    ![dashboard](src/assets/manageCourses.png)
+            
 
  
 
