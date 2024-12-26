@@ -4,6 +4,7 @@ Overview
 
 Campus Dashboard is a comprehensive management application for educational institutions. It facilitates efficient management of students, teachers, classrooms, and courses, providing essential tools for scheduling and resource organization. 
 
+![dashboard](src/assets/dashboard.png)
                        
 
 Features 
