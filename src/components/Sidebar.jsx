@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { saveAs } from "file-saver"; // File-Saver kitaplığı
+//import { saveAs } from "file-saver"; // File-Saver kitaplığı
 import "./Sidebar.css";
 
 function Sidebar({ activeTab, setActiveTab }) {

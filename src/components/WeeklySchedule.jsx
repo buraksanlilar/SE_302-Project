@@ -43,7 +43,6 @@ function WeeklySchedule({ student, updateSchedule }) {
 
   const handleDeleteCourse = (courseName) => {
     const studentName = student.name.toLowerCase(); // Öğrenci adını küçük harfe çevir
-
     // Haftalık programdan kursu kaldır
     const updatedSchedule = schedule.map((row) =>
       row.map((course) => (course === courseName ? null : course))
@@ -88,6 +87,8 @@ function WeeklySchedule({ student, updateSchedule }) {
     // Yerel depolamayı kontrol et
     const savedCourses = JSON.parse(localStorage.getItem("courses"));
     console.log("LocalStorage Courses After Update:", savedCourses);
+
+    alert("Schedule saved successfully!");
   };
 
   const placeCourseAutomatically = () => {

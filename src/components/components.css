@@ -2,17 +2,18 @@
 .container {
   max-width: 600px;
   margin: 20px auto;
-  padding: 15px;
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  background: linear-gradient(145deg, #ffffff, #e6e6e6);
+  border-radius: 12px;
+  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.1), -5px -5px 15px rgba(255, 255, 255, 0.8);
 }
 
 .container h3 {
-  margin-bottom: 15px;
-  font-size: 22px;
+  margin-bottom: 20px;
+  font-size: 24px;
   color: #333;
   text-align: center;
+  font-weight: bold;
 }
 
 /* Form Elemanları */
@@ -20,42 +21,49 @@
 .container select {
   display: block;
   width: 100%;
-  margin-bottom: 10px;
-  padding: 8px 10px;
-  font-size: 14px;
+  margin-bottom: 15px;
+  padding: 10px 12px;
+  font-size: 16px;
   border: 1px solid #ddd;
-  border-radius: 4px;
+  border-radius: 8px;
+  background: #f9f9f9;
   outline: none;
-  transition: all 0.3s ease;
+  transition: all 0.4s ease;
+  box-shadow: inset 3px 3px 8px rgba(0, 0, 0, 0.1), inset -3px -3px 8px rgba(255, 255, 255, 0.5);
 }
 
 .container input:focus,
 .container select:focus {
   border-color: #3498db;
-  box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+  box-shadow: 0 0 8px rgba(52, 152, 219, 0.5);
 }
 
 /* Buton Stilleri */
 .container button {
   display: inline-block;
-  padding: 8px 15px;
-  font-size: 14px;
-  background-color: #3498db;
+  padding: 8px 16px; /* Daha küçük padding */
+  font-size: 14px; /* Daha küçük font boyutu */
+  font-weight: 600;
+  background: linear-gradient(145deg, #3498db, #2980b9);
   color: #ffffff;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px; /* Daha küçük yuvarlatılmış köşeler */
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+  margin: 6px 4px; /* Daha dengeli ve küçük aralıklar */
+  box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.1), -3px -3px 6px rgba(255, 255, 255, 0.5);
 }
 
 .container button:hover {
-  background-color: #2980b9;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px); /* Daha az hover hareketi */
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+  background: linear-gradient(145deg, #2980b9, #1c6a96); /* Hover için renk geçişi */
 }
 
 .container button:active {
-  background-color: #1c6a96;
-  transform: scale(0.98);
+  transform: translateY(1px); /* Daha hafif tıklama efekti */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background: #1c6a96;
 }
 
 /* Listeleme için */
@@ -66,51 +74,54 @@
 }
 
 .container ul li {
-  background-color: #f9f9f9;
-  margin-bottom: 8px;
-  padding: 10px 15px;
-  border-radius: 4px;
+  background: linear-gradient(145deg, #ffffff, #f1f1f1);
+  margin-bottom: 10px;
+  padding: 12px 18px;
+  border-radius: 8px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   border: 1px solid #ddd;
+  box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.1), -3px -3px 8px rgba(255, 255, 255, 0.5);
   transition: all 0.3s ease;
 }
 
 .container ul li:hover {
-  background-color: #f1f1f1;
+  background: #f9f9f9;
 }
 
 .container ul li button {
-  padding: 5px 10px;
-  font-size: 12px;
-  background-color: #e74c3c;
+  padding: 5px 10px; /* Daha küçük padding */
+  font-size: 13px; /* Daha küçük font boyutu */
+  font-weight: bold;
+  background: linear-gradient(145deg, #e74c3c, #c0392b);
   border: none;
   color: #ffffff;
-  border-radius: 4px;
+  border-radius: 6px; /* Daha küçük yuvarlatma */
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .container ul li button:hover {
-  background-color: #c0392b;
+  background: #b03a2e;
 }
 
 /* Attendance Listesi */
 .attendance-item {
-  background-color: #fdfdfd;
+  background: linear-gradient(145deg, #fdfdfd, #f2f2f2);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 15px;
+  padding: 12px 18px;
   border: 1px solid #ddd;
-  border-radius: 4px;
-  margin-bottom: 8px;
-  transition: background-color 0.3s ease;
+  border-radius: 8px;
+  box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.1), -3px -3px 8px rgba(255, 255, 255, 0.5);
+  margin-bottom: 10px;
+  transition: all 0.3s ease;
 }
 
 .attendance-item:hover {
-  background-color: #f5f5f5;
+  background: #f7f7f7;
 }
 
 .attendance-item input[type="checkbox"] {
@@ -128,73 +139,68 @@
 }
 
 .card {
-  background-color: #ecf0f1;
-  padding: 15px;
-  border-radius: 8px;
+  background: linear-gradient(145deg, #ecf0f1, #d6dadc);
+  padding: 20px;
+  border-radius: 12px;
   text-align: center;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.1), -3px -3px 8px rgba(255, 255, 255, 0.5);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  transform: translateY(-8px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
 }
 
 .card h3 {
-  font-size: 18px;
+  font-size: 20px;
   color: #2c3e50;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .card p {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: bold;
   color: #34495e;
 }
 
 /* Öğrenci Arama ve Dropdown */
-.search-bar,
-.course-dropdown {
-  margin-bottom: 15px;
-}
-
 .search-bar input {
-  padding: 8px;
-  font-size: 14px;
+  padding: 10px;
+  font-size: 16px;
   width: 100%;
   border: 1px solid #ccc;
-  border-radius: 4px;
-  transition: border-color 0.3s ease;
+  border-radius: 8px;
+  background: #f9f9f9;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .search-bar input:focus {
   border-color: #3498db;
-  outline: none;
+  box-shadow: 0 0 8px rgba(52, 152, 219, 0.5);
 }
+
 /* Auto Assign Butonu */
 .auto-assign-button {
-  background-color: #2ecc71; /* Yeşil arka plan */
+  background: linear-gradient(145deg, #2ecc71, #27ae60);
   color: white;
   border: none;
-  padding: 6px 12px;
-  font-size: 14px;
+  padding: 8px 12px; /* Daha küçük padding */
+  font-size: 14px; /* Daha küçük font boyutu */
   cursor: pointer;
-  border-radius: 4px;
-  margin-left: 10px; /* Butonlar arasında boşluk */
-  transition: background-color 0.3s ease;
+  border-radius: 6px; /* Daha küçük yuvarlatma */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .auto-assign-button:hover {
-  background-color: #27ae60; /* Daha koyu yeşil hover efekti */
+  transform: translateY(-2px); /* Daha az hover hareketi */
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
 }
 
 /* Button Group */
 .button-group {
   display: flex;
-  gap: 10px; /* Butonlar arasında boşluk bırakır */
+  gap: 15px;
   justify-content: flex-start;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
 }
-
-
